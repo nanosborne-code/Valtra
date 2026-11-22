@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart Key Welcome — Operator Profile Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#23272a; --ink2:#3a4044; --sage:#cbd0bb; --sage2:#bfc6ae; --field:#91a07a; --field-line:#7f8d69;
+    --road:#e9e5d6; --road-edge:#a9ad98; --amber:#e8b04a; --green:#5fbf72; --red:#e0664f; --paper:#f6f5ef;
+    --muted:#6b7166;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#e9ebe4;font-family:Barlow,system-ui,sans-serif;color:var(--ink)}
+  .page{max-width:1180px;margin:0 auto;padding:20px 16px 40px}
+  .top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  .top h1{font-size:20px;margin:0;font-weight:700}
+  .top p{margin:0;color:var(--muted);font-size:14px}
+
+  /* Stage */
+  .stage{display:grid;grid-template-columns:1fr 250px;gap:16px}
+  @media (max-width:900px){.stage{grid-template-columns:1fr}}
+  .cab{background:#2b2f31;border-radius:22px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+  .screenWrap{position:relative;width:100%;aspect-ratio:16/10;overflow:hidden;border-radius:12px;background:#111}
+  .screen{position:absolute;left:0;top:0;width:1000px;height:625px;transform-origin:0 0}
+
+  /* Dash */
+  .dash{display:flex;align-items:center;gap:18px;padding:14px 8px 4px;color:#cfd3cc;flex-wrap:wrap}
+  .reader{width:74px;height:74px;border-radius:50%;background:#1d2022;border:3px solid #444a4d;display:grid;place-items:center;position:relative;flex:none}
+  .reader .led{width:12px;height:12px;border-radius:50%;background:#555;box-shadow:0 0 0 0 transparent;transition:.3s}
+  .reader.ready .led{background:var(--amber);animation:pulse 1.6s infinite}
+  .reader.ok .led{background:var(--green);box-shadow:0 0 14px var(--green)}
+  .reader.bad .led{background:var(--red);box-shadow:0 0 14px var(--red)}
+  .reader .lbl{position:absolute;bottom:-18px;font-size:11px;letter-spacing:.06em;color:#9aa09a;white-space:nowrap}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(232,176,74,.6)}70%{box-shadow:0 0 0 14px rgba(232,176,74,0)}100%{box-shadow:0 0 0 0 rgba(232,176,74,0)}}
+  .keys{display:flex;gap:10px;flex-wrap:wrap}
+  .key{display:flex;align-items:center;gap:8px;background:#3a3f42;border:1px solid #50575a;color:#fff;border-radius:12px;padding:8px 12px 8px 8px;cursor:pointer;font:inherit;font-size:14px;transition:transform .2s, opacity .2s}
+  .key:hover{transform:translateY(-2px);background:#434a4d}
+  .key .fob{width:26px;height:36px;border-radius:9px 9px 12px 12px;background:var(--ink);border:2px solid #777;position:relative}
+  .key .fob:after{content:"";position:absolute;left:50%;top:9px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--amber)}
+  .key.unknown .fob:after{background:#999}
+  .key small{display:block;color:#aab0ab;font-size:11px}
+  .key[disabled]{opacity:.35;cursor:default;transform:none}
+  .dash .hint{font-size:13px;color:#9aa09a}
+
+  /* Wizard panel */
+  .wizard{background:#fff;border-radius:16px;padding:16px;font-size:14px;align-self:start;border:1px solid #dde0d6}
+  .wizard h3{margin:0 0 4px;font-size:15px}
+  .wizard p{margin:0 0 12px;color:var(--muted);font-size:13px}
+  .wizard label.row{display:block;font-weight:600;margin:12px 0 6px;font-size:13px}
+  .seg{display:flex;background:#eef0e8;border-radius:10px;padding:3px}
+  .seg button{flex:1;border:0;background:transparent;padding:7px 6px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink2)}
+  .seg button.on{background:var(--ink);color:#fff}
+  .wbtn{width:100%;margin-top:14px;border:1px solid var(--ink);background:#fff;padding:9px;border-radius:10px;font:inherit;font-weight:600;cursor:pointer}
+  .wbtn:hover{background:#f3f4ef}
+  .jump{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+  .jump button{border:1px solid #d5d8cf;background:#fafaf7;border-radius:8px;padding:6px;font:inherit;font-size:12px;cursor:pointer}
+  .obs{margin-top:14px;padding:10px;background:#f6f5ef;border-radius:10px;font-size:12.5px;color:var(--ink2);line-height:1.45}
+  .obs b{display:block;margin-bottom:2px}
+
+  /* ---------- Screen content (1000x625 design space) ---------- */
+  .view{position:absolute;inset:0;display:none}
+  .view.on{display:block;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .hdr{height:64px;background:var(--ink);color:#fff;display:flex;align-items:center;gap:14px;padding:0 24px;font-size:19px}
+  .hdr b{font-weight:700}
+  .chip{background:var(--ink2);padding:6px 12px;border-radius:8px;font-weight:600;font-size:17px}
+  .chip.amb{background:var(--amber);color:var(--ink)}
+  .hdr .sp{flex:1}
+  .hdr .stat{display:flex;align-items:center;gap:8px;font-size:17px}
+  .dot{width:10px;height:10px;border-radius:50%;background:#fff;display:inline-block}
+  .op{display:flex;align-items:center;gap:8px;background:var(--ink2);padding:5px 10px 5px 5px;border-radius:20px;font-size:15px;cursor:pointer;border:0;color:#fff;font-family:inherit}
+  .av{width:28px;height:28px;border-radius:50%;background:var(--amber);color:var(--ink);display:grid;place-items:center;font-weight:800;font-size:14px}
+  .body{position:absolute;top:64px;left:0;right:0;bottom:0;background:var(--sage)}
+
+  /* idle */
+  #v-idle{background:var(--ink);color:#fff}
+  #v-idle .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center}
+  .bigkey{width:110px;height:150px;border-radius:30px 30px 40px 40px;border:4px solid #fff;position:relative;animation:bob 2.4s ease-in-out infinite}
+  .bigkey:after{content:"";position:absolute;left:50%;top:34px;width:28px;height:28px;margin-left:-14px;border-radius:50%;background:var(--amber)}
+  @keyframes bob{50%{transform:translateY(-8px)}}
+  #v-idle h2{font-size:40px;margin:0;font-weight:700}
+  #v-idle p{font-size:20px;margin:0;color:#b9beb8}
+  .clock{position:absolute;top:22px;left:28px;font-size:18px;color:#b9beb8}
+  .pinlink{position:absolute;bottom:26px;font-size:17px;color:#b9beb8;text-decoration:underline;cursor:pointer;background:none;border:0;font-family:inherit}
+
+  /* loading */
+  #v-load{background:var(--ink);color:#fff}
+  .loadBox{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:520px}
+  .loadBox h2{font-size:36px;margin:0 0 6px}
+  .loadBox .sub{color:#b9beb8;font-size:18px;margin-bottom:26px}
+  .chk{display:flex;align-items:center;gap:14px;font-size:21px;padding:10px 0;border-bottom:1px solid #3b4144;opacity:.35;transition:opacity .3s}
+  .chk.done{opacity:1}
+  .chk .tick{width:28px;height:28px;border-radius:50%;border:2px solid #666;display:grid;place-items:center;font-size:16px;flex:none}
+  .chk.done .tick{background:var(--green);border-color:var(--green);color:var(--ink)}
+  .chk .val{margin-left:auto;color:#b9beb8;font-size:17px}
+
+  /* assistant brief */
+  .brief{position:absolute;inset:0;display:grid;grid-template-columns:1fr 330px;gap:20px;padding:22px 24px}
+  .assistant{background:var(--paper);border-radius:16px;padding:24px 26px;display:flex;flex-direction:column;box-shadow:0 2px 0 rgba(0,0,0,.06)}
+  .aiTop{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+  .orb{width:50px;height:50px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;gap:3px;flex:none}
+  .orb i{width:4px;height:10px;background:var(--amber);border-radius:2px;display:block}
+  .orb.talk i{animation:wave .9s ease-in-out infinite}
+  .orb.talk i:nth-child(2){animation-delay:.15s}.orb.talk i:nth-child(3){animation-delay:.3s}.orb.talk i:nth-child(4){animation-delay:.45s}
+  @keyframes wave{50%{height:26px}}
+  .aiTop .nm{font-weight:700;font-size:20px}
+  .aiTop .st{font-size:15px;color:var(--muted)}
+  .mute{margin-left:auto;border:1px solid #cfd2c8;background:#fff;border-radius:18px;padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
+  .transcript{font-size:25px;line-height:1.38;font-weight:500;flex:1;min-height:180px}
+  .transcript .cursor{display:inline-block;width:3px;height:24px;background:var(--amber);vertical-align:-3px;margin-left:2px;animation:blink 1s infinite}
+  @keyframes blink{50%{opacity:0}}
+  .actions{display:flex;gap:12px;margin-top:16px}
+  .btn{border:0;border-radius:12px;padding:16px 22px;font:inherit;font-size:21px;font-weight:700;cursor:pointer;background:#fff;color:var(--ink);border:2px solid var(--ink)}
+  .btn.pri{background:var(--ink);color:#fff}
+  .btn.amb{background:var(--amber);border-color:var(--amber)}
+  .btn small{display:block;font-size:13px;font-weight:500;opacity:.7}
+  .say{font-size:14px;color:var(--muted);margin-top:10px}
+  .side{display:flex;flex-direction:column;gap:14px}
+  .card{background:#fff;border-radius:14px;padding:16px 18px}
+  .card h4{margin:0 0 8px;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .card .big{font-size:22px;font-weight:700}
+  .card .row2{display:flex;justify-content:space-between;font-size:17px;padding:4px 0}
+  .card.note{border-left:6px solid var(--amber)}
+  .card.note p{margin:0 0 4px;font-size:18px;line-height:1.3}
+  .card.note .who{font-size:14px;color:var(--muted)}
+  .noteBtns{display:flex;gap:8px;margin-top:10px}
+  .sbtn{border:2px solid var(--ink);background:#fff;border-radius:10px;padding:8px 12px;font:inherit;font-weight:700;font-size:15px;cursor:pointer}
+  .sbtn.pri{background:var(--ink);color:#fff}
+  .resolved{color:#3b8a4b;font-weight:700;font-size:16px;margin-top:8px}
+
+  /* plan */
+  .plan{position:absolute;inset:0;padding:22px 24px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .plan .card{padding:18px 20px}
+  .plan ol{margin:0;padding-left:22px;font-size:19px;line-height:1.5}
+  .plan ol li span{color:var(--muted);font-size:16px}
+  .planFoot{position:absolute;left:24px;right:24px;bottom:22px;display:flex;gap:12px;align-items:center}
+  .planFoot .say{margin:0 0 0 auto}
+
+  /* map */
+  .mapsvg{position:absolute;inset:0;width:100%;height:100%}
+  .bubble{position:absolute;right:24px;bottom:96px;width:330px;background:var(--paper);border-radius:16px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 6px 20px rgba(0,0,0,.15)}
+  .bubble .orb{width:42px;height:42px}
+  .bubble p{margin:0;font-size:18px;line-height:1.35;font-weight:500}
+  .bubble .src{font-size:13px;color:var(--muted);margin-top:4px}
+  .mini{position:absolute;right:24px;top:20px;width:290px}
+  .eod{position:absolute;right:24px;bottom:22px}
+
+  /* modal */
+  .scrim{position:absolute;inset:0;background:rgba(20,22,23,.55);display:none;align-items:center;justify-content:center;z-index:5}
+  .scrim.on{display:flex;animation:fade .25s}
+  .modal{background:var(--paper);border-radius:18px;padding:26px 28px;width:560px}
+  .modal h3{margin:0 0 6px;font-size:26px}
+  .modal p{margin:0 0 14px;font-size:18px;color:var(--ink2);line-height:1.35}
+  .opts{display:flex;flex-direction:column;gap:8px;margin:8px 0 16px}
+  .opt{border:2px solid #d5d8cf;background:#fff;border-radius:12px;padding:12px 14px;font:inherit;font-size:18px;text-align:left;cursor:pointer}
+  .opt.on{border-color:var(--ink);background:#fff8e8}
+  .rec{display:flex;align-items:center;gap:10px;font-size:16px;color:var(--muted);margin-bottom:12px}
+  .rec .rd{width:12px;height:12px;border-radius:50%;background:var(--red);animation:blink 1s infinite}
+  .mrow{display:flex;gap:10px;justify-content:flex-end}
+
+  /* error */
+  #v-err{background:var(--ink);color:#fff}
+  #v-err .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:0 120px}
+  .warnIcon{width:80px;height:80px;border-radius:50%;border:4px solid var(--red);display:grid;place-items:center;font-size:44px;font-weight:800;color:var(--red)}
+  #v-err h2{font-size:34px;margin:0}
+  #v-err p{font-size:20px;margin:0;color:#c3c8c2}
+  .errBtns{display:flex;gap:12px;margin-top:14px}
+  .btn.ghost{background:transparent;color:#fff;border-color:#fff}
+  .pin{display:flex;gap:10px;margin-top:10px}
+  .pin span{width:52px;height:62px;border-radius:10px;border:2px solid #777;display:grid;place-items:center;font-size:30px}
+
+  /* done */
+  #v-done{background:var(--ink);color:#fff}
+  #v-done .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center}
+  #v-done h2{font-size:38px;margin:0}
+  #v-done p{font-size:20px;margin:0;color:#c3c8c2;max-width:620px}
+  .quote{margin-top:12px;background:#2f3437;border-left:5px solid var(--amber);padding:14px 18px;border-radius:10px;font-size:19px;text-align:left;max-width:620px}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="top">
+    <h1>Smart Key Welcome: operator profile prototype</h1>
+    <p>Lo-fi concept for Wizard of Oz testing · in-cab screen, parked, start of day</p>
+  </div>
+
+  <div class="stage">
+    <div>
+      <div class="cab">
+        <div class="screenWrap" id="wrap">
+          <div class="screen" id="screen">
+
+            <!-- 1. IDLE -->
+            <section class="view on" id="v-idle">
+              <div class="clock" id="clock">06:02 · Mon</div>
+              <div class="center">
+                <div class="bigkey"></div>
+                <h2>Tap your Smart Key to start</h2>
+                <p>Hold your key to the reader on the dash</p>
+                <button class="pinlink" data-go="err-pin">No key? Sign in with PIN</button>
+              </div>
+            </section>
+
+            <!-- 2. LOADING -->
+            <section class="view" id="v-load">
+              <div class="loadBox">
+                <h2 id="loadHi">Hi Aino</h2>
+                <div class="sub">Loading your setup…</div>
+                <div class="chk"><div class="tick">✓</div>Seat &amp; mirrors<span class="val">Your position</span></div>
+                <div class="chk"><div class="tick">✓</div>Display layout<span class="val" id="lv-layout">Compact</span></div>
+                <div class="chk"><div class="tick">✓</div>Language<span class="val" id="lv-lang">English</span></div>
+                <div class="chk"><div class="tick">✓</div>Saved action sets<span class="val" id="lv-sets">2 for Field 7</span></div>
+                <div class="chk"><div class="tick">✓</div>Today's assignment<span class="val">From fleet manager</span></div>
+              </div>
+            </section>
+
+            <!-- 3. BRIEF -->
+            <section class="view" id="v-brief">
+              <div class="hdr">
+                <b>Good morning</b><span class="sp"></span>
+                <button class="op" data-go="notme"><span class="av" id="av1">A</span><span id="opName1">Aino</span> ▾</button>
+                <span class="stat"><span class="dot"></span>Parked</span>
+              </div>
+              <div class="body">
+                <div class="brief">
+                  <div class="assistant">
+                    <div class="aiTop">
+                      <div class="orb" id="orb"><i></i><i></i><i></i><i></i></div>
+                      <div><div class="nm">Assistant</div><div class="st" id="aiState">Speaking…</div></div>
+                      <button class="mute" id="muteBtn">🔊 Voice on</button>
+                    </div>
+                    <div class="transcript" id="transcript"></div>
+                    <div class="actions">
+                      <button class="btn pri" data-go="map">Start now</button>
+                      <button class="btn" data-go="plan">Full plan</button>
+                      <button class="btn" id="laterBtn">Later</button>
+                    </div>
+                    <div class="say">Or say <b>“Start”</b>, <b>“Full plan”</b> or <b>“Later”</b></div>
+                  </div>
+                  <div class="side">
+                    <div class="card">
+                      <h4>Today</h4>
+                      <div class="big">Seeding · Field 7</div>
+                      <div class="row2"><span>Implement</span><b>Seeder X</b></div>
+                      <div class="row2"><span>Entry</span><b>East entrance</b></div>
+                      <div class="row2"><span>Est. time</span><b>5 h 30 min</b></div>
+                    </div>
+                    <div class="card note" id="noteCard">
+                      <h4>Handover note</h4>
+                      <p>“Left rear tire looked low when I parked.”</p>
+                      <div class="who">From Jari · yesterday 18:40</div>
+                      <div class="noteBtns" id="noteBtns">
+                        <button class="sbtn pri" data-note="ok">Checked ✓</button>
+                        <button class="sbtn" data-note="report">Report issue</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 4. FULL PLAN -->
+            <section class="view" id="v-plan">
+              <div class="hdr">
+                <b>Today's plan</b><span class="sp"></span>
+                <button class="op" data-go="notme"><span class="av" id="av2">A</span><span id="opName2">Aino</span> ▾</button>
+                <span class="stat"><span class="dot"></span>Parked</span>
+              </div>
+              <div class="body">
+                <div class="plan">
+                  <div class="card">
+                    <h4>Before you go</h4>
+                    <ol id="preList"></ol>
+                  </div>
+                  <div class="card">
+                    <h4>Day</h4>
+                    <ol>
+                      <li>Drive to Field 7 <span>· 12 min, road</span></li>
+                      <li>Enter from east side <span>· 2 saved actions</span></li>
+                      <li>Seed Field 7, south boundary first <span>· ~5 h</span></li>
+                      <li>Refill seed at midday <span>· trailer at yard</span></li>
+                      <li>Return & leave a note <span>· end of day</span></li>
+                    </ol>
+                    <div class="row2" style="margin-top:12px;border-top:1px solid #eee;padding-top:10px"><span>Conditions</span><b>Dry topsoil · light wind</b></div>
+                  </div>
+                  <div class="planFoot">
+                    <button class="btn pri" data-go="map">Start now</button>
+                    <button class="btn" data-go="brief-back">Back</button>
+                    <div class="say">Or say <b>“Start”</b></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 5. MAP -->
+            <section class="view" id="v-map">
+              <div class="hdr">
+                <b>Task: Seeding</b><span class="chip">Field 7</span><span class="chip amb">Seeder X</span>
+                <span class="sp"></span>
+                <button class="op" data-go="notme"><span class="av" id="av3">A</span><span id="opName3">Aino</span> ▾</button>
+                <span class="stat"><span class="dot" style="background:var(--green)"></span>Ready · 0 km/h</span>
+              </div>
+              <div class="body">
+                <svg class="mapsvg" viewBox="0 0 1000 561" preserveAspectRatio="xMidYMid slice">
+                  <defs>
+                    <pattern id="rows" width="20" height="22" patternUnits="userSpaceOnUse">
+                      <rect width="20" height="22" fill="#91a07a"/><line x1="0" y1="21" x2="20" y2="21" stroke="#7f8d69" stroke-width="1.5"/>
+                    </pattern>
+                  </defs>
+                  <rect width="1000" height="561" fill="#cbd0bb"/>
+                  <rect x="560" y="60" width="300" height="140" rx="8" fill="#bfc6ae"/>
+                  <rect x="660" y="430" width="240" height="110" rx="8" fill="#bfc6ae"/>
+                  <!-- field -->
+                  <rect x="70" y="60" width="420" height="340" fill="url(#rows)" stroke="#4a4f45" stroke-width="4" stroke-dasharray="16 10"/>
+                  <text x="280" y="245" font-family="Barlow" font-weight="800" font-size="52" fill="#4c5545" text-anchor="middle">Field 7</text>
+                  <!-- roads -->
+                  <path d="M70 470 H620" stroke="#a9ad98" stroke-width="30" fill="none"/>
+                  <path d="M70 470 H620" stroke="#e9e5d6" stroke-width="24" fill="none"/>
+                  <path d="M620 561 V310 Q620 270 580 270 H490" stroke="#a9ad98" stroke-width="30" fill="none"/>
+                  <path d="M620 561 V310 Q620 270 580 270 H490" stroke="#e9e5d6" stroke-width="24" fill="none"/>
+                  <!-- route -->
+                  <path d="M280 470 H620 V310 Q620 270 580 270 H494" stroke="#e8b04a" stroke-width="7" fill="none" stroke-dasharray="14 10" stroke-linecap="round">
+                    <animate attributeName="stroke-dashoffset" from="48" to="0" dur="1.2s" repeatCount="indefinite"/>
+                  </path>
+                  <!-- pin with badge -->
+                  <g transform="translate(490 238)">
+                    <path d="M0 32 C-22 4 -22 -26 0 -26 C22 -26 22 4 0 32Z" fill="#23272a" stroke="#fff" stroke-width="3"/>
+                    <circle cx="0" cy="-6" r="7" fill="#fff"/>
+                    <circle cx="18" cy="-26" r="13" fill="#e8b04a" stroke="#fff" stroke-width="2"/>
+                    <text x="18" y="-21" font-family="Barlow" font-weight="800" font-size="15" text-anchor="middle" fill="#23272a">2</text>
+                  </g>
+                  <g transform="translate(360 140)">
+                    <rect width="120" height="34" rx="8" fill="#fff"/>
+                    <text x="60" y="23" font-family="Barlow" font-weight="700" font-size="17" text-anchor="middle" fill="#23272a">East entrance</text>
+                  </g>
+                  <!-- tractor heading east -->
+                  <g transform="translate(280 470)">
+                    <rect x="-58" y="-16" width="34" height="32" rx="5" fill="#4a4f52" stroke="#fff" stroke-width="3"/>
+                    <circle r="24" fill="#23272a" stroke="#fff" stroke-width="4"/>
+                    <path d="M-8 -12 L12 0 L-8 12 Z" fill="#fff"/>
+                    <rect x="-38" y="30" width="76" height="28" rx="7" fill="#fff"/>
+                    <text x="0" y="50" font-family="Barlow" font-weight="700" font-size="16" text-anchor="middle" fill="#23272a">You</text>
+                  </g>
+                </svg>
+
+                <div class="card note mini" id="miniNote">
+                  <h4>Handover note</h4>
+                  <p style="font-size:16px">Left rear tire looked low.</p>
+                  <div class="noteBtns" id="noteBtns2">
+                    <button class="sbtn pri" data-note="ok">Checked ✓</button>
+                    <button class="sbtn" data-note="report">Report</button>
+                  </div>
+                </div>
+
+                <div class="bubble">
+                  <div class="orb" id="orb2"><i></i><i></i><i></i><i></i></div>
+                  <div>
+                    <p id="mapMsg">Okay, head east and then up to the entrance. When you get there, I'll have your usual two entry steps ready.</p>
+                    <div class="src">Saved actions are from your profile · used 4× here</div>
+                  </div>
+                </div>
+                <button class="btn eod" data-go="eod">End of day</button>
+              </div>
+            </section>
+
+            <!-- 6. ERROR: unknown key / PIN -->
+            <section class="view" id="v-err">
+              <div class="center">
+                <div class="warnIcon">!</div>
+                <h2 id="errTitle">This key isn't set up for this tractor</h2>
+                <p id="errText">Ask your fleet manager to add this machine to your key, or sign in another way.</p>
+                <div class="pin" id="pinBoxes" style="display:none"><span>•</span><span>•</span><span></span><span></span></div>
+                <div class="errBtns">
+                  <button class="btn amb" id="pinBtn">Sign in with PIN</button>
+                  <button class="btn ghost" id="guestBtn">Guest mode</button>
+                  <button class="btn ghost" data-go="idle">Back</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- 7. DONE -->
+            <section class="view" id="v-done">
+              <div class="center">
+                <h2>Saved. See you tomorrow.</h2>
+                <p id="doneText">Your setup is saved to your key. The next operator on this tractor will hear your note when they tap in.</p>
+                <div class="quote" id="doneQuote"></div>
+                <button class="btn ghost" style="margin-top:18px" data-go="idle">Back to start</button>
+              </div>
+            </section>
+
+            <!-- Modals -->
+            <div class="scrim" id="m-eod">
+              <div class="modal">
+                <h3>Wrapping up, <span class="opFirst">Aino</span>?</h3>
+                <p>Save today's changes to your profile? (Seat moved, 1 new action set at the headland.)</p>
+                <p style="margin-bottom:6px"><b>Leave a note for the next operator</b></p>
+                <div class="rec"><span class="rd"></span>Listening… or pick one</div>
+                <div class="opts" id="noteOpts">
+                  <button class="opt">“Seeder X needs a refill, about 20% left.”</button>
+                  <button class="opt">“North headland is wet, enter from the east.”</button>
+                  <button class="opt">“All good, nothing to report.”</button>
+                </div>
+                <div class="mrow">
+                  <button class="sbtn" data-close>Not now</button>
+                  <button class="sbtn" id="saveNoNote">Save, no note</button>
+                  <button class="sbtn pri" id="saveNote">Save &amp; leave note</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="scrim" id="m-notme">
+              <div class="modal">
+                <h3>Not your settings?</h3>
+                <p>This tractor is set up for <b class="opFirst">Aino</b>. Switch to another operator or use guest mode (default settings, nothing saved).</p>
+                <div class="mrow">
+                  <button class="sbtn" data-close>Cancel</button>
+                  <button class="sbtn" id="mGuest">Guest mode</button>
+                  <button class="sbtn pri" data-go="idle">Switch operator</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="scrim" id="m-report">
+              <div class="modal">
+                <h3>Report: left rear tire</h3>
+                <p>I'll send this to your fleet manager with the tractor's location. Do you want to wait for a reply or continue?</p>
+                <div class="mrow">
+                  <button class="sbtn" data-close>Cancel</button>
+                  <button class="sbtn" id="repWait">Send &amp; wait</button>
+                  <button class="sbtn pri" id="repGo">Send &amp; continue</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="dash">
+          <div class="reader ready" id="reader"><span class="led"></span><span class="lbl">KEY READER</span></div>
+          <div class="keys" id="keys">
+            <button class="key" data-key="aino"><span class="fob"></span><span>Aino's key<small>Experienced · English</small></span></button>
+            <button class="key" data-key="eero"><span class="fob"></span><span>Eero's key<small>New operator · Suomi</small></span></button>
+            <button class="key unknown" data-key="unknown"><span class="fob"></span><span>Unregistered key<small>Edge case</small></span></button>
+          </div>
+          <div class="hint">Click a key to tap it on the reader</div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="wizard">
+      <h3>Facilitator panel</h3>
+      <p>For the person running the session. Keep it hidden from participants.</p>
+      <label class="row">Welcome length</label>
+      <div class="seg" id="lenSeg"><button data-v="short">Short</button><button data-v="full" class="on">Full</button></div>
+      <label class="row">Voice</label>
+      <div class="seg" id="voiceSeg"><button data-v="on" class="on">On</button><button data-v="off">Text only</button></div>
+      <label class="row">Assistant voice</label>
+      <select id="voiceSel" style="width:100%;padding:8px;border-radius:8px;border:1px solid #d5d8cf;font:inherit;font-size:13px"></select>
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <div class="seg" id="rateSeg" style="flex:1"><button data-v="0.9">Slower</button><button data-v="0.96" class="on">Natural</button><button data-v="1.05">Brisk</button></div>
+        <button class="jump" id="testVoice" style="border:1px solid #d5d8cf;background:#fafaf7;border-radius:8px;padding:0 10px;font:inherit;font-size:12px;cursor:pointer;margin:0">▶ Test</button>
+      </div>
+      <p style="margin:6px 0 0;font-size:12px">Bold = higher-quality voice. Edge's “Natural” voices and Safari's “Premium” voices sound most human.</p>
+      <label class="row">Jump to screen</label>
+      <div class="jump">
+        <button data-go="idle">1 Tap in</button>
+        <button data-go="brief">3 Welcome</button>
+        <button data-go="plan">4 Full plan</button>
+        <button data-go="map">5 Map</button>
+        <button data-go="eod">6 End of day</button>
+        <button data-go="err">Key error</button>
+      </div>
+      <button class="wbtn" data-go="idle">↺ Restart session</button>
+      <div class="obs">
+        <b>Watch for</b>
+        Do they know what to do with the key? Do they answer by voice, by touch or not at all? Ask them to repeat the brief back. How do they react to the end-of-day note?
+      </div>
+      <div class="obs">
+        <b>Ask after</b>
+        “What did the tractor know about you? Who else can see it? What should come with you to another tractor?”
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ---------- scaling ----------
+  const wrap = document.getElementById('wrap'), screen = document.getElementById('screen');
+  function fit(){ screen.style.transform = 'scale(' + (wrap.clientWidth/1000) + ')'; }
+  window.addEventListener('resize', fit); fit();
+
+  // ---------- data ----------
+  const OPS = {
+    aino:{ name:'Aino', init:'A', layout:'Compact', lang:'English', sets:'2 for Field 7', level:'exp',
+      voiceLang:'en-US' },
+    eero:{ name:'Eero', init:'E', layout:'Guided', lang:'Suomi (voice) · English (screen)', sets:'0 yet, learning', level:'new',
+      voiceLang:'en-US' }
+  };
+  const state = { op:'aino', len:'full', voice:true, noteDone:false, chosenNote:null, voiceName:null, rate:0.96 };
+  let timers = [];
+  function clearTimers(){ timers.forEach(clearTimeout); timers=[]; try{speechSynthesis.cancel()}catch(e){} }
+  function later(fn,ms){ timers.push(setTimeout(fn,ms)); }
+
+  function brief(){
+    const o = OPS[state.op];
+    if (o.level==='exp'){
+      return state.len==='short'
+        ? `Morning, ${o.name}. Field 7 today, with Seeder X. Jari left a note about the left rear tire. Want the plan, or ready to go?`
+        : `Morning, ${o.name}. I've set your seat and screen the way you like them. Today it's seeding in Field 7 with Seeder X, and you'll go in from the east side. Oh, and Jari left you a note. He thinks the left rear tire's a bit low, so it might be worth a quick look before you head out. Want me to run through the plan, or are you good to go?`;
+    }
+    return state.len==='short'
+      ? `Morning, ${o.name}. Field 7 today. I'll guide you through the Seeder X setup as we go. Want the plan first, or jump right in?`
+      : `Good morning, ${o.name}. Today you're seeding Field 7 with Seeder X. It's your first time with this seeder, so no worries, I'll walk you through the setup one step at a time. I've also pulled in a few tips from people who seed this field a lot. One more thing. Jari left a note saying the left rear tire looked low, so let's check that first. Want to hear the plan, or jump right in?`;
+  }
+
+  // ---------- views ----------
+  const views = ['idle','load','brief','plan','map','err','done'];
+  function show(v){
+    document.querySelectorAll('.scrim').forEach(s=>s.classList.remove('on'));
+    views.forEach(n=>document.getElementById('v-'+n).classList.toggle('on', n===v));
+  }
+  function applyOp(){
+    const o = OPS[state.op];
+    ['opName1','opName2','opName3'].forEach(id=>document.getElementById(id).textContent=o.name);
+    ['av1','av2','av3'].forEach(id=>document.getElementById(id).textContent=o.init);
+    document.querySelectorAll('.opFirst').forEach(e=>e.textContent=o.name);
+    document.getElementById('loadHi').textContent = 'Hi ' + o.name;
+    document.getElementById('lv-layout').textContent = o.layout;
+    document.getElementById('lv-lang').textContent = o.lang;
+    document.getElementById('lv-sets').textContent = o.sets;
+    const pre = o.level==='exp'
+      ? ['Check left rear tire <span>· handover note</span>','Walk-around <span>· your usual 2 min</span>','Seeder X calibration <span>· last done 3 days ago</span>']
+      : ['Check left rear tire <span>· handover note</span>','Walk-around checklist <span>· guided, 6 steps</span>','Hitch Seeder X <span>· step-by-step on screen</span>','Calibrate seed rate <span>· tip from experienced operators</span>'];
+    document.getElementById('preList').innerHTML = pre.map(x=>'<li>'+x+'</li>').join('');
+    document.getElementById('mapMsg').textContent = o.level==='exp'
+      ? "Okay, head east and then up to the entrance. When you get there, I'll have your usual two entry steps ready."
+      : "Alright, head east, then up to the entrance. At the gate, I'll show you how others usually go in. Four-wheel drive on, diff lock on.";
+  }
+
+  // ---------- audio ----------
+  let actx;
+  function chime(ok){
+    try{
+      actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+      const notes = ok ? [660,880] : [300,220];
+      notes.forEach((f,i)=>{
+        const o = actx.createOscillator(), g = actx.createGain();
+        o.frequency.value=f; o.type='sine';
+        g.gain.setValueAtTime(0.0001, actx.currentTime+i*0.14);
+        g.gain.exponentialRampToValueAtTime(0.25, actx.currentTime+i*0.14+0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime+i*0.14+0.3);
+        o.connect(g).connect(actx.destination); o.start(actx.currentTime+i*0.14); o.stop(actx.currentTime+i*0.14+0.32);
+      });
+    }catch(e){}
+  }
+  const NATURAL = /natural|neural|premium|enhanced|online|siri/i;
+  function rankVoice(v){
+    let r = 0;
+    if (NATURAL.test(v.name)) r += 100;
+    if (/Aria|Jenny|Ava|Samantha|Zoe|Libby|Sonia|Google US English|Google UK English Female/i.test(v.name)) r += 40;
+    if (/^en[-_]US/i.test(v.lang)) r += 10; else if (/^en/i.test(v.lang)) r += 5;
+    if (/compact|eloquence|fred|albert|bad news|bells|boing|bubbles|cellos|whisper|zarvox|trinoids|jester|organ|superstar|wobble/i.test(v.name)) r -= 200;
+    return r;
+  }
+  function englishVoices(){
+    let vs = []; try{ vs = speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang)); }catch(e){}
+    return vs.sort((a,b)=>rankVoice(b)-rankVoice(a));
+  }
+  function pickVoice(){
+    const vs = englishVoices();
+    return vs.find(v=>v.name===state.voiceName) || vs[0];
+  }
+  function speak(text, orbEl, onEnd){
+    const orb = orbEl ? document.getElementById(orbEl) : null;
+    if(!state.voice || !('speechSynthesis' in window)){ onEnd && onEnd(); return; }
+    try{
+      speechSynthesis.cancel();
+      // speak sentence by sentence with short natural pauses
+      const parts = text.match(/[^.!?]+[.!?]+["”]?|[^.!?]+$/g) || [text];
+      const v = pickVoice();
+      let i = 0;
+      orb && orb.classList.add('talk');
+      const next = ()=>{
+        if(i >= parts.length){ orb && orb.classList.remove('talk'); onEnd && onEnd(); return; }
+        const chunk = parts[i++].trim();
+        const u = new SpeechSynthesisUtterance(chunk);
+        if(v) u.voice = v;
+        u.rate = state.rate * (/\?$/.test(chunk) ? 0.97 : 1);
+        u.pitch = /\?$/.test(chunk) ? 1.06 : 1.0;
+        u.onend = ()=>{ const pause = /,$|\.$/.test(chunk) ? 260 : 180; later(next, pause); };
+        u.onerror = ()=>{ orb && orb.classList.remove('talk'); };
+        speechSynthesis.speak(u);
+      };
+      next();
+    }catch(e){ onEnd && onEnd(); }
+  }
+  function fillVoices(){
+    const sel = document.getElementById('voiceSel'); if(!sel) return;
+    const vs = englishVoices();
+    if(!vs.length){ sel.innerHTML = '<option>Browser default</option>'; return; }
+    sel.innerHTML = vs.map(v=>'<option'+(NATURAL.test(v.name)?' style="font-weight:700"':'')+'>'+v.name+'</option>').join('');
+    sel.value = state.voiceName || vs[0].name;
+  }
+  try{ speechSynthesis.onvoiceschanged = fillVoices; }catch(e){}
+
+  // ---------- flows ----------
+  function tapKey(k){
+    clearTimers();
+    const reader = document.getElementById('reader');
+    reader.className = 'reader';
+    if(k==='unknown'){
+      reader.classList.add('bad'); chime(false);
+      document.getElementById('errTitle').textContent = "This key isn't set up for this tractor";
+      document.getElementById('errText').textContent = "Ask your fleet manager to add this machine to your key, or sign in another way.";
+      document.getElementById('pinBoxes').style.display='none';
+      show('err'); return;
+    }
+    state.op = k; state.noteDone=false; resetNote(); applyOp();
+    reader.classList.add('ok'); chime(true);
+    runLoad();
+  }
+  function runLoad(){
+    show('load');
+    const items = document.querySelectorAll('#v-load .chk');
+    items.forEach(i=>i.classList.remove('done'));
+    items.forEach((it,i)=>later(()=>it.classList.add('done'), 350 + i*380));
+    later(runBrief, 350 + items.length*380 + 500);
+  }
+  function runBrief(){
+    show('brief');
+    const text = brief(), tEl = document.getElementById('transcript'), st = document.getElementById('aiState');
+    tEl.innerHTML=''; st.textContent = state.voice ? 'Speaking…' : 'Message';
+    const orb = document.getElementById('orb');
+    if(!state.voice) orb.classList.add('talk');
+    speak(text, 'orb');
+    const words = text.split(' '); let i=0;
+    const step = ()=>{
+      if(i>=words.length){ tEl.innerHTML = text; st.textContent='Listening for “Start”, “Full plan” or “Later”'; if(!state.voice) orb.classList.remove('talk'); return; }
+      i++; tEl.innerHTML = words.slice(0,i).join(' ') + '<span class="cursor"></span>';
+      later(step, state.voice ? 330 : 120);
+    };
+    step();
+  }
+  function runMap(){
+    clearTimers(); show('map');
+    document.getElementById('miniNote').style.display = state.noteDone ? 'none' : 'block';
+    speak(document.getElementById('mapMsg').textContent, 'orb2');
+  }
+
+  function resetNote(){
+    ['noteBtns','noteBtns2'].forEach(id=>{
+      const el=document.getElementById(id);
+      el.innerHTML='<button class="sbtn pri" data-note="ok">Checked ✓</button><button class="sbtn" data-note="report">'+(id==='noteBtns'?'Report issue':'Report')+'</button>';
+    });
+  }
+  function resolveNote(msg){
+    state.noteDone = true;
+    ['noteBtns','noteBtns2'].forEach(id=>document.getElementById(id).innerHTML='<div class="resolved">'+msg+'</div>');
+    later(()=>{ document.getElementById('miniNote').style.display='none'; }, 1400);
+  }
+
+  // ---------- events ----------
+  document.getElementById('keys').addEventListener('click', e=>{
+    const b = e.target.closest('.key'); if(b) tapKey(b.dataset.key);
+  });
+
+  document.addEventListener('click', e=>{
+    const n = e.target.closest('[data-note]');
+    if(n){ if(n.dataset.note==='ok') resolveNote('✓ Marked checked · logged for fleet manager'); else document.getElementById('m-report').classList.add('on'); return; }
+    if(e.target.closest('[data-close]')){ e.target.closest('.scrim').classList.remove('on'); return; }
+    const g = e.target.closest('[data-go]'); if(!g) return;
+    const to = g.dataset.go;
+    if(to==='idle'){ clearTimers(); document.getElementById('reader').className='reader ready'; show('idle'); }
+    else if(to==='brief'){ applyOp(); clearTimers(); runBrief(); }
+    else if(to==='brief-back'){ clearTimers(); show('brief'); }
+    else if(to==='plan'){ applyOp(); clearTimers(); show('plan'); speak("Sure. Here's the plan for today.", 'orb'); }
+    else if(to==='map'){ applyOp(); runMap(); }
+    else if(to==='eod'){ clearTimers(); if(!document.getElementById('v-map').classList.contains('on')){ applyOp(); show('map'); } document.getElementById('m-eod').classList.add('on'); }
+    else if(to==='notme'){ document.getElementById('m-notme').classList.add('on'); }
+    else if(to==='err'){ tapKey('unknown'); }
+    else if(to==='err-pin'){ show('err'); pinMode(); }
+  });
+
+  document.getElementById('laterBtn').onclick = ()=>{
+    clearTimers();
+    document.getElementById('transcript').textContent = "No problem, I'll stay quiet. Just say “Brief me” when you're ready.";
+    document.getElementById('aiState').textContent = 'Paused';
+  };
+  let muted=false;
+  document.getElementById('muteBtn').onclick = ()=>{
+    muted=!muted; try{speechSynthesis.cancel()}catch(e){}
+    document.getElementById('muteBtn').textContent = muted ? '🔇 Muted' : '🔊 Voice on';
+    state.voice = !muted;
+  };
+  function pinMode(){
+    document.getElementById('errTitle').textContent = 'Enter your 4-digit PIN';
+    document.getElementById('errText').textContent = 'Your profile loads the same way as with your key.';
+    document.getElementById('pinBoxes').style.display='flex';
+    later(()=>{ state.op='aino'; applyOp(); resetNote(); runLoad(); }, 1800);
+  }
+  document.getElementById('pinBtn').onclick = pinMode;
+  function guest(){
+    clearTimers(); document.querySelectorAll('.scrim').forEach(s=>s.classList.remove('on'));
+    show('done');
+    document.querySelector('#v-done h2').textContent = 'Guest mode';
+    document.getElementById('doneText').textContent = 'Default settings loaded. Nothing will be saved to a profile, and no welcome brief.';
+    document.getElementById('doneQuote').style.display='none';
+  }
+  document.getElementById('guestBtn').onclick = guest;
+  document.getElementById('mGuest').onclick = guest;
+
+  document.getElementById('repWait').onclick = document.getElementById('repGo').onclick = ()=>{
+    document.getElementById('m-report').classList.remove('on');
+    resolveNote('⚑ Sent to fleet manager with location');
+  };
+
+  document.getElementById('noteOpts').addEventListener('click', e=>{
+    const b=e.target.closest('.opt'); if(!b) return;
+    document.querySelectorAll('#noteOpts .opt').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); state.chosenNote = b.textContent;
+  });
+  function finish(withNote){
+    clearTimers(); show('done');
+    document.querySelector('#v-done h2').textContent = 'Saved. See you tomorrow, ' + OPS[state.op].name + '.';
+    document.getElementById('doneText').textContent = withNote
+      ? 'Your setup is saved to your key. The next operator on this tractor will hear your note when they tap in.'
+      : 'Your setup is saved to your key.';
+    const q = document.getElementById('doneQuote');
+    if(withNote){
+      const note = state.chosenNote || '“All good, nothing to report.”';
+      q.style.display='block'; q.innerHTML = '<b>Tomorrow\'s welcome will include:</b><br>' + OPS[state.op].name + ' left a note: ' + note;
+    } else q.style.display='none';
+    document.getElementById('reader').className='reader';
+    speak(withNote ? "All saved. I'll pass your note on to whoever's next. See you tomorrow." : "All saved. See you tomorrow.", null);
+  }
+  document.getElementById('saveNote').onclick = ()=>finish(true);
+  document.getElementById('saveNoNote').onclick = ()=>finish(false);
+
+  // wizard toggles
+  function seg(id, key, map){
+    document.getElementById(id).addEventListener('click', e=>{
+      const b=e.target.closest('button'); if(!b) return;
+      document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.toggle('on', x===b));
+      state[key] = map ? map(b.dataset.v) : b.dataset.v;
+      if(key==='voice'){ muted=!state.voice; document.getElementById('muteBtn').textContent = muted ? '🔇 Muted' : '🔊 Voice on'; if(!state.voice) try{speechSynthesis.cancel()}catch(e){} }
+    });
+  }
+  seg('lenSeg','len'); seg('voiceSeg','voice', v=>v==='on'); seg('rateSeg','rate', v=>parseFloat(v));
+  document.getElementById('voiceSel').addEventListener('change', e=>{ state.voiceName = e.target.value; });
+  document.getElementById('testVoice').addEventListener('click', ()=>{ const was=state.voice; state.voice=true; speak("Morning! Here's how I sound today.", 'orb'); state.voice=was; });
+  fillVoices();
+
+  // clock
+  const d = new Date();
+  try{ speechSynthesis.getVoices(); }catch(e){}
+  applyOp();
+})();
+</script>
+</body>
+</html>

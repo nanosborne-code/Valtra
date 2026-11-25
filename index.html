@@ -517,8 +517,8 @@
         : `Morning, ${o.name}. I've set your seat and screen the way you like them. Today it's seeding in Field 7 with Seeder X, and you'll go in from the east side. Oh, and Jari left you a note. He thinks the left rear tire's a bit low, so it might be worth a quick look before you head out. Want me to run through the plan, or are you good to go?`;
     }
     return state.len==='short'
-      ? `Morning, ${o.name}. Field 7 today. I'll guide you through the Seeder X setup as we go. Want the plan first, or jump right in?`
-      : `Good morning, ${o.name}. Today you're seeding Field 7 with Seeder X. It's your first time with this seeder, so no worries, I'll walk you through the setup one step at a time. I've also pulled in a few tips from people who seed this field a lot. One more thing. Jari left a note saying the left rear tire looked low, so let's check that first. Want to hear the plan, or jump right in?`;
+      ? `Morning, ${o.name}. Field 7 today, with Seeder X. I've added a few tips from experienced operators. Want the plan first, or jump right in?`
+      : `Good morning, ${o.name}. Today you're seeding Field 7 with Seeder X. It's your first time with this seeder, so I've pulled in a few tips from people who seed this field a lot. One more thing. Jari left a note saying the left rear tire looked low, so let's check that first. Want to hear the plan, or jump right in?`;
   }
 
   // ---------- views ----------
@@ -539,7 +539,7 @@
     document.getElementById('lv-sets').textContent = o.sets;
     const pre = o.level==='exp'
       ? ['Check left rear tire <span>· handover note</span>','Walk-around <span>· your usual 2 min</span>','Seeder X calibration <span>· last done 3 days ago</span>']
-      : ['Check left rear tire <span>· handover note</span>','Walk-around checklist <span>· guided, 6 steps</span>','Hitch Seeder X <span>· step-by-step on screen</span>','Calibrate seed rate <span>· tip from experienced operators</span>'];
+      : ['Check left rear tire <span>· handover note</span>','Walk-around checklist <span>· guided, 6 steps</span>','Hitch Seeder X <span>· first time with this seeder</span>','Calibrate seed rate <span>· tip from experienced operators</span>'];
     document.getElementById('preList').innerHTML = pre.map(x=>'<li>'+x+'</li>').join('');
     state.mapMsg = o.level==='exp'
       ? "Okay, head east and then up to the entrance. When you get there, I'll have your usual entry setup ready."

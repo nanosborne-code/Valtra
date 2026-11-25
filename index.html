@@ -857,7 +857,7 @@ ${route}${tractorSvg(pos[0],pos[1],pos[2])}${conn}${pinSvg('A',on==='A')}${P.sav
     if(!document.getElementById('v-pins').classList.contains('on')){ clearTimers(); pReset(); show('pins'); }
     P.phase='boundary'; P.card=null;
     P.msg = isExp() ? "Set up Seeder X when you're ready. I'll keep track and offer to save it for next time."
-                    : "Time to set up Seeder X. Want me to walk you through it? I'll offer to save your setup when you're done.";
+                    : "Time to set up Seeder X. I'll offer to save your setup when you're done.";
     P.src = '';
     pDraw(); speak(P.msg, 'orb2');
   }

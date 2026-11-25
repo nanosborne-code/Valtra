@@ -436,7 +436,7 @@
           <div class="reader ready" id="reader"><span class="led"></span><span class="lbl">KEY READER</span></div>
           <div class="keys" id="keys">
             <button class="key" data-key="aino"><span class="fob"></span><span>Aino's key<small>Experienced · English</small></span></button>
-            <button class="key" data-key="eero"><span class="fob"></span><span>Eero's key<small>New operator · Suomi</small></span></button>
+            <button class="key" data-key="eero"><span class="fob"></span><span>Eero's key<small>New operator · English</small></span></button>
             <button class="key unknown" data-key="unknown"><span class="fob"></span><span>Unregistered key<small>Edge case</small></span></button>
           </div>
           <div class="hint">Click a key to tap it on the reader</div>
@@ -453,7 +453,6 @@
       <div class="seg" id="voiceSeg"><button data-v="on" class="on">On</button><button data-v="off">Text only</button></div>
       <label class="row">Voice replies (operator speaks)</label>
       <div class="seg" id="srSeg"><button data-v="off" class="on">Off</button><button data-v="tap">Tap to talk</button><button data-v="auto">Auto-listen</button></div>
-      <div class="seg" id="srLangSeg" style="margin-top:6px"><button data-v="en-US" class="on">Listen in English</button><button data-v="fi-FI">Suomi</button></div>
       <p class="vnote" id="srNote">Needs Chrome and the GitHub Pages link (the preview blocks the microphone). Chrome sends audio to Google to recognize it, so tell participants.</p>
       <label class="row">Assistant voice</label>
       <select id="voiceSel" style="width:100%;padding:8px;border-radius:8px;border:1px solid #d5d8cf;font:inherit;font-size:13px"></select>
@@ -502,10 +501,10 @@
   const OPS = {
     aino:{ name:'Aino', init:'A', layout:'Compact', lang:'English', sets:'2 for Field 7', level:'exp',
       voiceLang:'en-US' },
-    eero:{ name:'Eero', init:'E', layout:'Guided', lang:'Suomi (voice) · English (screen)', sets:'0 yet, learning', level:'new',
+    eero:{ name:'Eero', init:'E', layout:'Guided', lang:'English', sets:'0 yet, learning', level:'new',
       voiceLang:'en-US' }
   };
-  const state = { op:'aino', len:'full', voice:true, noteDone:false, chosenNote:null, voiceName:'Google US English', rate:0.96, sr:'off', srLang:'en-US' };
+  const state = { op:'aino', len:'full', voice:true, noteDone:false, chosenNote:null, voiceName:'Google US English', rate:0.96, sr:'off' };
   let timers = [];
   function clearTimers(){ timers.forEach(clearTimeout); timers=[]; try{speechSynthesis.cancel()}catch(e){} }
   function later(fn,ms){ timers.push(setTimeout(fn,ms)); }
@@ -634,13 +633,12 @@
   }
   // What the operator can say on each screen (shown on screen, and spoken when voice replies are on)
   const OPTS={
-    en:{brief:['Start','Full plan','Later'],plan:['Start','Refill first','Back'],offer:['Preview','Not now','Why here'],preview:['Apply','Back'],applied:['Done','Undo'],prompt:['Save','Not now'],review:['Save','Cancel'],eod:['Record a note','Send','Not now']},
-    fi:{brief:['Aloita','Suunnitelma','Myöhemmin'],plan:['Aloita','Täyttö ensin','Takaisin'],offer:['Näytä','Ei nyt','Miksi'],preview:['Käytä','Takaisin'],applied:['Valmis','Kumoa'],prompt:['Tallenna','Ei nyt'],review:['Tallenna','Peruuta'],eod:['Nauhoita','Lähetä','Ei nyt']}
+    en:{brief:['Start','Full plan','Later'],plan:['Start','Refill first','Back'],offer:['Preview','Not now','Why here'],preview:['Apply','Back'],applied:['Done','Undo'],prompt:['Save','Not now'],review:['Save','Cancel'],eod:['Record a note','Send','Not now']}
   };
   function ctxKey(){ if(document.getElementById('m-eod').classList.contains('on')) return 'eod'; if(state.view==='pins') return P.card||null; return state.view; }
-  function optsFor(k){ return k ? (OPTS[state.srLang==='fi-FI'?'fi':'en'][k]||null) : null; }
+  function optsFor(k){ return k ? (OPTS.en[k]||null) : null; }
   function sayHtml(k){ const o=optsFor(k); if(!o) return ''; const q=o.map(x=>'<b>“'+x+'”</b>'); return 'Say '+(q.length>1? q.slice(0,-1).join(', ')+' or '+q[q.length-1] : q[0]); }
-  function spokenOpts(k){ const o=optsFor(k); if(!o||state.sr==='off') return ''; if(state.srLang==='fi-FI') return ' You can answer in Finnish. The options are on screen.'; return ' You can say '+(o.length>1? o.slice(0,-1).join(', ')+', or '+o[o.length-1] : o[0])+'.'; }
+  function spokenOpts(k){ const o=optsFor(k); if(!o||state.sr==='off') return ''; return ' You can say '+(o.length>1? o.slice(0,-1).join(', ')+', or '+o[o.length-1] : o[0])+'.'; }
   function renderSay(){
     const b=document.getElementById('sayBrief'), p=document.getElementById('sayPlan'), e=document.getElementById('sayEod');
     if(b) b.innerHTML=sayHtml('brief'); if(p) p.innerHTML=sayHtml('plan'); if(e) e.innerHTML=sayHtml('eod');
@@ -658,7 +656,7 @@
     if(!SR){ heard('<b>Voice replies aren\'t supported in this browser.</b> Use Chrome, or tap instead.', true); return; }
     if(listening){ try{rec.stop()}catch(e){} return; }
     try{ speechSynthesis.cancel(); }catch(e){}
-    rec = new SR(); rec.lang = state.srLang; rec.interimResults=false; rec.maxAlternatives=3; rec.continuous=false;
+    rec = new SR(); rec.lang = 'en-US'; rec.interimResults=false; rec.maxAlternatives=3; rec.continuous=false;
     rec.onstart=()=>{ listening=true; updatePill(); };
     rec.onend=()=>{ listening=false; updatePill(); };
     rec.onerror=(e)=>{ listening=false; updatePill();
@@ -860,7 +858,7 @@ ${route}${tractorSvg(pos[0],pos[1],pos[2])}${conn}${pinSvg('A',on==='A')}${P.sav
     P.phase='boundary'; P.card=null;
     P.msg = isExp() ? "Set up Seeder X when you're ready. I'll keep track and offer to save it for next time."
                     : "Time to set up Seeder X. Want me to walk you through it? I'll offer to save your setup when you're done.";
-    P.src = 'Prepares for first task · guided setup is the next step to prototype';
+    P.src = '';
     pDraw(); speak(P.msg, 'orb2');
   }
   function pAct(a){
@@ -868,10 +866,15 @@ ${route}${tractorSvg(pos[0],pos[1],pos[2])}${conn}${pinSvg('A',on==='A')}${P.sav
     if(a==='why') P.why=!P.why;
     else if(a==='preview'){ P.card='preview'; pDraw(); ask('This will '+r.acts.join(' and ').toLowerCase()+'.'); return; }
     else if(a==='back') P.card='offer';
-    else if(a==='close'){ P.card=null; P.why=false; if(P.phase==='arrived'){ P.msg='No problem. I won\'t change anything.'; P.src=''; } }
+    else if(a==='close'){ P.card=null; P.why=false;
+      // Declining at the entrance must not leave the operator stuck: say so, then carry on into the field
+      if(P.phase==='arrived'){ P.msg='No problem, I won\'t change anything. Heading in.'; P.src='The pin stays on the map if you change your mind.'; pDraw(); speak(P.msg, 'orb2'); later(()=>{ if(P.phase==='arrived' && !P.card) toBoundary(); }, 2500); return; } }
     else if(a==='apply'){ P.applied[P.rid]=true; P.card='applied'; pToast({text:'Applied: '+r.acts.join(', '),undo:true}); pDraw(); ask('Done. '+r.acts.length+' settings applied.'); return; }
-    else if(a==='undo'){ P.applied[P.rid]=false; P.card=null; pToast({text:'Reverted last change'}); speak('Okay, I put it back.', null); }
-    else if(a==='done'){ P.card=null; pDraw(); later(toBoundary, 900); return; }
+    else if(a==='undo'){ P.applied[P.rid]=false; pToast({text:'Reverted · settings are back to how they were'});
+      // At the entrance, bring the offer back so they can try again or decline (Not now carries on)
+      if(P.phase==='arrived'){ P.card='offer'; P.why=false; pDraw(); ask('Okay, I put it back. Want to try it again?'); return; }
+      P.card=null; speak('Okay, I put it back.', null); }
+    else if(a==='done'){ P.card=null; pDraw(); later(()=>{ if(!P.card) toBoundary(); }, 900); return; }
     else if(a==='prompt'){ if(!document.getElementById('v-pins').classList.contains('on')) toBoundary(); P.phase='boundary'; P.rid='B'; P.card='prompt'; ask('You made four changes here. Want to save them for next time?'); }
     else if(a==='review'){ P.card='review'; pDraw(); ask("Here's what you changed. Save it to your profile?"); return; }
     else if(a==='scope-loc') P.scope='loc';
@@ -1001,8 +1004,8 @@ ${route}${tractorSvg(pos[0],pos[1],pos[2])}${conn}${pinSvg('A',on==='A')}${P.sav
     });
   }
   seg('lenSeg','len'); seg('voiceSeg','voice', v=>v==='on'); seg('rateSeg','rate', v=>parseFloat(v));
-  seg('srSeg','sr'); seg('srLangSeg','srLang');
-  ['srSeg','srLangSeg'].forEach(id=>document.getElementById(id).addEventListener('click', ()=>{ renderSay(); if(state.view==='pins') pDraw(); }));
+  seg('srSeg','sr');
+  document.getElementById('srSeg').addEventListener('click', ()=>{ renderSay(); if(state.view==='pins') pDraw(); });
   renderSay();
   document.getElementById('srSeg').addEventListener('click', ()=>{ if(state.sr==='off' && listening){ try{rec.stop()}catch(e){} } updatePill(); if(state.sr!=='off' && !SR) heard('<b>This browser has no speech recognition.</b> Use Chrome.', true); });
   document.getElementById('micPill').addEventListener('click', listen);

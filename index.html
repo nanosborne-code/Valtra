@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Smart Key Welcome — Operator Profile Prototype</title>
+<title>Operator Day — Smart Key Welcome + Location Action Pins</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -139,15 +139,67 @@
   .planFoot{position:absolute;left:24px;right:24px;bottom:22px;display:flex;gap:12px;align-items:center}
   .planFoot .say{margin:0 0 0 auto}
 
-  /* map */
-  .mapsvg{position:absolute;inset:0;width:100%;height:100%}
-  .bubble{position:absolute;right:24px;bottom:96px;width:330px;background:var(--paper);border-radius:16px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 6px 20px rgba(0,0,0,.15)}
-  .bubble .orb{width:42px;height:42px}
-  .bubble p{margin:0;font-size:18px;line-height:1.35;font-weight:500}
-  .bubble .src{font-size:13px;color:var(--muted);margin-top:4px}
-  .mini{position:absolute;right:24px;top:20px;width:290px}
-  .eod{position:absolute;right:24px;bottom:22px}
-
+  /* ---------- Location Action Pins (Jessie) — 1280x800 stage scaled into the 1000x625 screen ---------- */
+  #v-pins{background:#c9cfba}
+  #ps{position:absolute;left:0;top:0;width:1280px;height:800px;transform:scale(.78125);transform-origin:0 0;background:#c9cfba;color:#23272a;font-family:Barlow,sans-serif}
+  #ps .phd{position:absolute;left:0;top:0;width:1280px;height:56px;background:#23272a;color:#f1f0ea;display:flex;align-items:center;gap:18px;padding:0 24px;font-size:20px;z-index:3}
+  #ps .phd b{font-weight:700}#ps .phd .sp{flex:1}
+  #ps .pchip{background:#3a4044;border-radius:8px;padding:5px 12px;font-weight:600;font-size:18px}
+  #ps .pchip.t{background:#f2b01e;color:#23272a}
+  #ps .op{font-size:17px}
+  #ps svg.pmap{position:absolute;left:0;top:56px}
+  #ps .pcard{position:absolute;left:866px;top:76px;width:380px;background:#f5f4ee;border-radius:14px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.4);z-index:2;animation:pin .18s ease-out}
+  @keyframes pin{from{opacity:.4;transform:translateX(12px)}}
+  #ps .pcard h2{margin:0 0 4px;font-size:32px;line-height:1.1;font-weight:700}
+  #ps .pcap{display:flex;align-items:center;gap:6px;font-size:16px;color:#4a5055;margin-bottom:8px;font-weight:600}
+  #ps .pctx{font-size:18px;color:#4a5055;margin:2px 0 10px}
+  #ps .pmeta{display:inline-block;background:#e4e2d6;border-radius:8px;padding:6px 12px;font-size:18px;font-weight:600;margin-bottom:12px}
+  #ps .pq{font-size:21px;font-weight:600;line-height:1.25;margin:2px 0 16px}
+  #ps .pbody{font-size:19px;line-height:1.3;margin:6px 0 18px}
+  #ps .pcard button{font:inherit;cursor:pointer;border-radius:10px;min-height:60px;font-size:20px;font-weight:700;width:100%;color:#23272a;background:#e4e2d6;border:2px solid #c8c6b8}
+  #ps .pcard button.p{background:#f2b01e;border-color:#23272a}
+  #ps .prow{display:flex;gap:10px;margin-top:10px}
+  #ps .psay{font-size:17px;color:#4a5055;margin-top:12px;line-height:1.35}
+  #ps .psay b{color:#23272a}
+  #ps .pwhy{background:#e9eef3;border-radius:10px;padding:12px 14px;font-size:18px;line-height:1.3;margin:0 0 12px;display:flex;gap:10px;align-items:flex-start}
+  #ps .pact{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #d3d1c6;border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:20px;font-weight:600;min-height:54px}
+  #ps .pact i{font-style:normal;background:#23272a;color:#fff;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:16px;flex:none}
+  #ps .pact em{margin-left:auto;font-style:normal;color:#2f6b3a;font-size:16px;font-weight:700;display:flex;gap:5px;align-items:center}
+  #ps .pnote{font-size:16px;color:#4a5055;margin:6px 0 12px}
+  #ps .pban{display:flex;gap:10px;align-items:center;background:#e1efe3;border-radius:10px;padding:12px;font-size:19px;font-weight:700;margin:6px 0 14px;color:#1d4a27}
+  #ps label{display:block;font-size:16px;font-weight:700;margin:12px 0 4px;color:#4a5055}
+  #ps input{width:100%;height:56px;font:inherit;font-size:22px;font-weight:600;padding:0 14px;border-radius:10px;border:2px solid #8a8d86;background:#fff;color:#23272a}
+  #ps .pscope{display:flex;gap:8px}
+  #ps .pscope button{min-height:52px;font-size:17px}
+  #ps .pscope button.on{background:#e9eef3;border-color:#23272a}
+  #ps .ptoast{position:absolute;left:90px;top:76px;background:#23272a;color:#fff;border-radius:12px;padding:12px 14px 12px 20px;font-size:22px;font-weight:600;display:flex;gap:12px;align-items:center;z-index:4;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+  #ps .ptoast button{font:inherit;font-size:20px;font-weight:700;background:#f2b01e;color:#23272a;border:0;border-radius:8px;padding:8px 16px;cursor:pointer}
+  #ps .pbubble{position:absolute;left:700px;top:80px;width:550px;background:#f5f4ee;border-radius:16px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start;box-shadow:0 6px 20px rgba(0,0,0,.18);z-index:2}
+  #ps .pbubble p{margin:0;font-size:22px;line-height:1.35;font-weight:500}
+  #ps .pbubble .src{font-size:16px;color:#5d6359;margin-top:6px}
+  #ps .peod{position:absolute;right:24px;bottom:24px;font:inherit;font-size:22px;font-weight:700;background:#fff;border:2px solid #23272a;border-radius:12px;padding:14px 22px;cursor:pointer;z-index:2}
+  /* voice replies */
+  .micPill{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:7;display:none;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:20px;border:2px solid #f2b01e;background:#2f3437;color:#fff;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+  .micPill.show{display:flex}
+  .micPill.pins{top:5px;height:34px;font-size:15px;left:62%}
+  .micPill .md{width:10px;height:10px;border-radius:50%;background:#f2b01e}
+  .micPill.listening{background:#a1461f;border-color:#fff}
+  .micPill.listening .md{background:#fff;animation:blink .8s infinite}
+  .heard{position:absolute;top:64px;left:50%;transform:translateX(-50%);z-index:7;background:#fff;color:#23272a;border-radius:12px;padding:10px 16px;font-size:16px;box-shadow:0 6px 20px rgba(0,0,0,.25);display:none;max-width:640px;text-align:center}
+  .heard.show{display:block;animation:fade .2s}
+  .heard b{color:#2f6b3a}
+  .heard.miss b{color:#a1461f}
+  .vnote{font-size:12px;color:var(--muted);margin:6px 0 0}
+  .modal.wide{width:900px}
+  .eodGrid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:10px 0 16px}
+  .lbl{font-weight:700;font-size:15px !important;letter-spacing:.06em;text-transform:uppercase;color:var(--muted) !important;margin:0 0 8px !important}
+  ul.sum{margin:0 0 8px;padding-left:22px;font-size:17px;line-height:1.45}
+  ul.sum li.open{color:#a1461f}
+  .tiny{font-size:14px !important;color:var(--muted) !important}
+  .modal.wide .opt{font-size:16px;padding:10px 12px}
+  .planFoot .btn{font-size:19px;padding:14px 18px;white-space:nowrap}
+  .planMsg{font-size:16px;color:#2f6b3a;font-weight:700;margin-left:6px}
+  .play{border:1px solid #cfd2c8;background:#f6f5ef;border-radius:18px;padding:5px 12px;font:inherit;font-size:14px;cursor:pointer;margin-top:6px}
   /* modal */
   .scrim{position:absolute;inset:0;background:rgba(20,22,23,.55);display:none;align-items:center;justify-content:center;z-index:5}
   .scrim.on{display:flex;animation:fade .25s}
@@ -183,8 +235,8 @@
 <body>
 <div class="page">
   <div class="top">
-    <h1>Smart Key Welcome: operator profile prototype</h1>
-    <p>Lo-fi concept for Wizard of Oz testing · in-cab screen, parked, start of day</p>
+    <h1>Operator day: Smart Key Welcome + Location Action Pins</h1>
+    <p>Combined concept prototype for Wizard of Oz testing · Smart Key Welcome (Nan) · Location-Based Action Pins (Jessie)</p>
   </div>
 
   <div class="stage">
@@ -238,7 +290,7 @@
                       <button class="btn" data-go="plan">Full plan</button>
                       <button class="btn" id="laterBtn">Later</button>
                     </div>
-                    <div class="say">Or say <b>“Start”</b>, <b>“Full plan”</b> or <b>“Later”</b></div>
+                    <div class="say" id="sayBrief"></div>
                   </div>
                   <div class="side">
                     <div class="card">
@@ -252,6 +304,7 @@
                       <h4>Handover note</h4>
                       <p>“Left rear tire looked low when I parked.”</p>
                       <div class="who">From Jari · yesterday 18:40</div>
+                      <button class="play" data-note="play">▶ Play Jari's voice note · 0:06</button>
                       <div class="noteBtns" id="noteBtns">
                         <button class="sbtn pri" data-note="ok">Checked ✓</button>
                         <button class="sbtn" data-note="report">Report issue</button>
@@ -277,94 +330,22 @@
                   </div>
                   <div class="card">
                     <h4>Day</h4>
-                    <ol>
-                      <li>Drive to Field 7 <span>· 12 min, road</span></li>
-                      <li>Enter from east side <span>· 2 saved actions</span></li>
-                      <li>Seed Field 7, south boundary first <span>· ~5 h</span></li>
-                      <li>Refill seed at midday <span>· trailer at yard</span></li>
-                      <li>Return & leave a note <span>· end of day</span></li>
-                    </ol>
+                    <ol id="dayList"></ol>
                     <div class="row2" style="margin-top:12px;border-top:1px solid #eee;padding-top:10px"><span>Conditions</span><b>Dry topsoil · light wind</b></div>
                   </div>
                   <div class="planFoot">
                     <button class="btn pri" data-go="map">Start now</button>
+                    <button class="btn" id="changePlan">Change plan</button>
                     <button class="btn" data-go="brief-back">Back</button>
-                    <div class="say">Or say <b>“Start”</b></div>
+                    <span class="planMsg" id="planMsg"></span>
+                    <div class="say" id="sayPlan"></div>
                   </div>
                 </div>
               </div>
             </section>
 
-            <!-- 5. MAP -->
-            <section class="view" id="v-map">
-              <div class="hdr">
-                <b>Task: Seeding</b><span class="chip">Field 7</span><span class="chip amb">Seeder X</span>
-                <span class="sp"></span>
-                <button class="op" data-go="notme"><span class="av" id="av3">A</span><span id="opName3">Aino</span> ▾</button>
-                <span class="stat"><span class="dot" style="background:var(--green)"></span>Ready · 0 km/h</span>
-              </div>
-              <div class="body">
-                <svg class="mapsvg" viewBox="0 0 1000 561" preserveAspectRatio="xMidYMid slice">
-                  <defs>
-                    <pattern id="rows" width="20" height="22" patternUnits="userSpaceOnUse">
-                      <rect width="20" height="22" fill="#91a07a"/><line x1="0" y1="21" x2="20" y2="21" stroke="#7f8d69" stroke-width="1.5"/>
-                    </pattern>
-                  </defs>
-                  <rect width="1000" height="561" fill="#cbd0bb"/>
-                  <rect x="560" y="60" width="300" height="140" rx="8" fill="#bfc6ae"/>
-                  <rect x="660" y="430" width="240" height="110" rx="8" fill="#bfc6ae"/>
-                  <!-- field -->
-                  <rect x="70" y="60" width="420" height="340" fill="url(#rows)" stroke="#4a4f45" stroke-width="4" stroke-dasharray="16 10"/>
-                  <text x="280" y="245" font-family="Barlow" font-weight="800" font-size="52" fill="#4c5545" text-anchor="middle">Field 7</text>
-                  <!-- roads -->
-                  <path d="M70 470 H620" stroke="#a9ad98" stroke-width="30" fill="none"/>
-                  <path d="M70 470 H620" stroke="#e9e5d6" stroke-width="24" fill="none"/>
-                  <path d="M620 561 V310 Q620 270 580 270 H490" stroke="#a9ad98" stroke-width="30" fill="none"/>
-                  <path d="M620 561 V310 Q620 270 580 270 H490" stroke="#e9e5d6" stroke-width="24" fill="none"/>
-                  <!-- route -->
-                  <path d="M280 470 H620 V310 Q620 270 580 270 H494" stroke="#e8b04a" stroke-width="7" fill="none" stroke-dasharray="14 10" stroke-linecap="round">
-                    <animate attributeName="stroke-dashoffset" from="48" to="0" dur="1.2s" repeatCount="indefinite"/>
-                  </path>
-                  <!-- pin with badge -->
-                  <g transform="translate(490 238)">
-                    <path d="M0 32 C-22 4 -22 -26 0 -26 C22 -26 22 4 0 32Z" fill="#23272a" stroke="#fff" stroke-width="3"/>
-                    <circle cx="0" cy="-6" r="7" fill="#fff"/>
-                    <circle cx="18" cy="-26" r="13" fill="#e8b04a" stroke="#fff" stroke-width="2"/>
-                    <text x="18" y="-21" font-family="Barlow" font-weight="800" font-size="15" text-anchor="middle" fill="#23272a">2</text>
-                  </g>
-                  <g transform="translate(360 140)">
-                    <rect width="120" height="34" rx="8" fill="#fff"/>
-                    <text x="60" y="23" font-family="Barlow" font-weight="700" font-size="17" text-anchor="middle" fill="#23272a">East entrance</text>
-                  </g>
-                  <!-- tractor heading east -->
-                  <g transform="translate(280 470)">
-                    <rect x="-58" y="-16" width="34" height="32" rx="5" fill="#4a4f52" stroke="#fff" stroke-width="3"/>
-                    <circle r="24" fill="#23272a" stroke="#fff" stroke-width="4"/>
-                    <path d="M-8 -12 L12 0 L-8 12 Z" fill="#fff"/>
-                    <rect x="-38" y="30" width="76" height="28" rx="7" fill="#fff"/>
-                    <text x="0" y="50" font-family="Barlow" font-weight="700" font-size="16" text-anchor="middle" fill="#23272a">You</text>
-                  </g>
-                </svg>
-
-                <div class="card note mini" id="miniNote">
-                  <h4>Handover note</h4>
-                  <p style="font-size:16px">Left rear tire looked low.</p>
-                  <div class="noteBtns" id="noteBtns2">
-                    <button class="sbtn pri" data-note="ok">Checked ✓</button>
-                    <button class="sbtn" data-note="report">Report</button>
-                  </div>
-                </div>
-
-                <div class="bubble">
-                  <div class="orb" id="orb2"><i></i><i></i><i></i><i></i></div>
-                  <div>
-                    <p id="mapMsg">Okay, head east and then up to the entrance. When you get there, I'll have your usual two entry steps ready.</p>
-                    <div class="src">Saved actions are from your profile · used 4× here</div>
-                  </div>
-                </div>
-                <button class="btn eod" data-go="eod">End of day</button>
-              </div>
-            </section>
+            <!-- 5. FIELD MAP + LOCATION ACTION PINS (Jessie's concept, integrated) -->
+            <section class="view" id="v-pins"><div id="ps"></div></section>
 
             <!-- 6. ERROR: unknown key / PIN -->
             <section class="view" id="v-err">
@@ -391,22 +372,35 @@
               </div>
             </section>
 
+            <!-- Voice reply controls (shown only when Voice replies is on) -->
+            <button class="micPill" id="micPill"><span class="md"></span><span id="micLabel">Tap to answer by voice</span></button>
+            <div class="heard" id="heard"></div>
+
             <!-- Modals -->
             <div class="scrim" id="m-eod">
-              <div class="modal">
+              <div class="modal wide">
                 <h3>Wrapping up, <span class="opFirst">Aino</span>?</h3>
-                <p>Save today's changes to your profile? (Seat moved, 1 new action set at the headland.)</p>
-                <p style="margin-bottom:6px"><b>Leave a note for the next operator</b></p>
-                <div class="rec"><span class="rd"></span>Listening… or pick one</div>
-                <div class="opts" id="noteOpts">
-                  <button class="opt">“Seeder X needs a refill, about 20% left.”</button>
-                  <button class="opt">“North headland is wet, enter from the east.”</button>
-                  <button class="opt">“All good, nothing to report.”</button>
+                <div class="eodGrid">
+                  <div>
+                    <p class="lbl">Today's summary · drafted for you</p>
+                    <ul class="sum" id="sumList"></ul>
+                    <p class="tiny">Logged automatically during the day. Check it, then send. Nothing goes to your manager without you.</p>
+                  </div>
+                  <div>
+                    <p class="lbl">Note for the next operator</p>
+                    <div class="rec"><span class="rd"></span>Listening… or pick one</div>
+                    <div class="opts" id="noteOpts">
+                      <button class="opt">🎙 Record a voice note (they'll hear your voice)</button>
+                      <button class="opt">“Seeder X needs a refill, about 20% left.”</button>
+                      <button class="opt">“North headland is wet, enter from the east.”</button>
+                    </div>
+                  </div>
                 </div>
-                <div class="mrow">
+                <div class="mrow" style="align-items:center">
+                  <span class="tiny" id="sayEod" style="margin-right:auto"></span>
                   <button class="sbtn" data-close>Not now</button>
-                  <button class="sbtn" id="saveNoNote">Save, no note</button>
-                  <button class="sbtn pri" id="saveNote">Save &amp; leave note</button>
+                  <button class="sbtn" id="saveNoNote">Send summary, no note</button>
+                  <button class="sbtn pri" id="saveNote">Send summary &amp; leave note</button>
                 </div>
               </div>
             </div>
@@ -457,6 +451,10 @@
       <div class="seg" id="lenSeg"><button data-v="short">Short</button><button data-v="full" class="on">Full</button></div>
       <label class="row">Voice</label>
       <div class="seg" id="voiceSeg"><button data-v="on" class="on">On</button><button data-v="off">Text only</button></div>
+      <label class="row">Voice replies (operator speaks)</label>
+      <div class="seg" id="srSeg"><button data-v="off" class="on">Off</button><button data-v="tap">Tap to talk</button><button data-v="auto">Auto-listen</button></div>
+      <div class="seg" id="srLangSeg" style="margin-top:6px"><button data-v="en-US" class="on">Listen in English</button><button data-v="fi-FI">Suomi</button></div>
+      <p class="vnote" id="srNote">Needs Chrome and the GitHub Pages link (the preview blocks the microphone). Chrome sends audio to Google to recognize it, so tell participants.</p>
       <label class="row">Assistant voice</label>
       <select id="voiceSel" style="width:100%;padding:8px;border-radius:8px;border:1px solid #d5d8cf;font:inherit;font-size:13px"></select>
       <div style="display:flex;gap:6px;margin-top:6px">
@@ -467,20 +465,27 @@
       <label class="row">Jump to screen</label>
       <div class="jump">
         <button data-go="idle">1 Tap in</button>
-        <button data-go="brief">3 Welcome</button>
-        <button data-go="plan">4 Full plan</button>
-        <button data-go="map">5 Map</button>
-        <button data-go="eod">6 End of day</button>
+        <button data-go="brief">2 Welcome</button>
+        <button data-go="plan">3 Full plan</button>
+        <button data-go="map">4 Drive to field</button>
+        <button data-go="arrive">5 Entrance offer</button>
+        <button data-go="boundary">6 South boundary</button>
+        <button data-go="eod">7 End of day</button>
         <button data-go="err">Key error</button>
+      </div>
+      <label class="row">Field simulation</label>
+      <div class="jump">
+        <button data-p="prompt">Operator made 4 setup changes</button>
+        <button data-p="return">Return here later</button>
       </div>
       <button class="wbtn" data-go="idle">↺ Restart session</button>
       <div class="obs">
         <b>Watch for</b>
-        Do they know what to do with the key? Do they answer by voice, by touch or not at all? Ask them to repeat the brief back. How do they react to the end-of-day note?
+        Do they know what to do with the key? Voice, touch or neither? Can they repeat the brief back? At the entrance: do they Preview before Apply, and do they open “Why here?” Do they trust a routine from other operators? Do they check the summary before sending?
       </div>
       <div class="obs">
         <b>Ask after</b>
-        “What did the tractor know about you? Who else can see it? What should come with you to another tractor?”
+        “What did the tractor know about you? Who else can see it? Would you use another operator's routine? What should come with you to another tractor?”
       </div>
     </aside>
   </div>
@@ -500,7 +505,7 @@
     eero:{ name:'Eero', init:'E', layout:'Guided', lang:'Suomi (voice) · English (screen)', sets:'0 yet, learning', level:'new',
       voiceLang:'en-US' }
   };
-  const state = { op:'aino', len:'full', voice:true, noteDone:false, chosenNote:null, voiceName:null, rate:0.96 };
+  const state = { op:'aino', len:'full', voice:true, noteDone:false, chosenNote:null, voiceName:'Google US English', rate:0.96, sr:'off', srLang:'en-US' };
   let timers = [];
   function clearTimers(){ timers.forEach(clearTimeout); timers=[]; try{speechSynthesis.cancel()}catch(e){} }
   function later(fn,ms){ timers.push(setTimeout(fn,ms)); }
@@ -518,15 +523,16 @@
   }
 
   // ---------- views ----------
-  const views = ['idle','load','brief','plan','map','err','done'];
+  const views = ['idle','load','brief','plan','pins','err','done'];
   function show(v){
     document.querySelectorAll('.scrim').forEach(s=>s.classList.remove('on'));
     views.forEach(n=>document.getElementById('v-'+n).classList.toggle('on', n===v));
+    state.view = v; if(typeof updatePill==='function') updatePill();
   }
   function applyOp(){
     const o = OPS[state.op];
-    ['opName1','opName2','opName3'].forEach(id=>document.getElementById(id).textContent=o.name);
-    ['av1','av2','av3'].forEach(id=>document.getElementById(id).textContent=o.init);
+    ['opName1','opName2'].forEach(id=>document.getElementById(id).textContent=o.name);
+    ['av1','av2'].forEach(id=>document.getElementById(id).textContent=o.init);
     document.querySelectorAll('.opFirst').forEach(e=>e.textContent=o.name);
     document.getElementById('loadHi').textContent = 'Hi ' + o.name;
     document.getElementById('lv-layout').textContent = o.layout;
@@ -536,9 +542,10 @@
       ? ['Check left rear tire <span>· handover note</span>','Walk-around <span>· your usual 2 min</span>','Seeder X calibration <span>· last done 3 days ago</span>']
       : ['Check left rear tire <span>· handover note</span>','Walk-around checklist <span>· guided, 6 steps</span>','Hitch Seeder X <span>· step-by-step on screen</span>','Calibrate seed rate <span>· tip from experienced operators</span>'];
     document.getElementById('preList').innerHTML = pre.map(x=>'<li>'+x+'</li>').join('');
-    document.getElementById('mapMsg').textContent = o.level==='exp'
-      ? "Okay, head east and then up to the entrance. When you get there, I'll have your usual two entry steps ready."
-      : "Alright, head east, then up to the entrance. At the gate, I'll show you how others usually go in. Four-wheel drive on, diff lock on.";
+    state.mapMsg = o.level==='exp'
+      ? "Okay, head east and then up to the entrance. When you get there, I'll have your usual entry setup ready."
+      : "Alright, head east, then up to the entrance. At the gate, I'll show you how experienced operators usually go in.";
+    renderDay();
   }
 
   // ---------- audio ----------
@@ -560,6 +567,7 @@
   const NATURAL = /natural|neural|premium|enhanced|online|siri/i;
   function rankVoice(v){
     let r = 0;
+    if (v.name === 'Google US English') r += 1000;   // team default voice
     if (NATURAL.test(v.name)) r += 100;
     if (/Aria|Jenny|Ava|Samantha|Zoe|Libby|Sonia|Google US English|Google UK English Female/i.test(v.name)) r += 40;
     if (/^en[-_]US/i.test(v.lang)) r += 10; else if (/^en/i.test(v.lang)) r += 5;
@@ -574,7 +582,7 @@
     const vs = englishVoices();
     return vs.find(v=>v.name===state.voiceName) || vs[0];
   }
-  function speak(text, orbEl, onEnd){
+  function speak(text, orbEl, onEnd, opts){
     const orb = orbEl ? document.getElementById(orbEl) : null;
     if(!state.voice || !('speechSynthesis' in window)){ onEnd && onEnd(); return; }
     try{
@@ -590,7 +598,7 @@
         const u = new SpeechSynthesisUtterance(chunk);
         if(v) u.voice = v;
         u.rate = state.rate * (/\?$/.test(chunk) ? 0.97 : 1);
-        u.pitch = /\?$/.test(chunk) ? 1.06 : 1.0;
+        u.pitch = (opts&&opts.pitch) || (/\?$/.test(chunk) ? 1.06 : 1.0);
         u.onend = ()=>{ const pause = /,$|\.$/.test(chunk) ? 260 : 180; later(next, pause); };
         u.onerror = ()=>{ orb && orb.classList.remove('talk'); };
         speechSynthesis.speak(u);
@@ -603,9 +611,122 @@
     const vs = englishVoices();
     if(!vs.length){ sel.innerHTML = '<option>Browser default</option>'; return; }
     sel.innerHTML = vs.map(v=>'<option'+(NATURAL.test(v.name)?' style="font-weight:700"':'')+'>'+v.name+'</option>').join('');
-    sel.value = state.voiceName || vs[0].name;
+    // "Google US English" only exists in Chrome; elsewhere show the voice actually used
+    if(!vs.some(v=>v.name===state.voiceName)) state.voiceName = vs[0].name;
+    sel.value = state.voiceName;
   }
   try{ speechSynthesis.onvoiceschanged = fillVoices; }catch(e){}
+
+  // ---------- voice replies (speech recognition) ----------
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec=null, listening=false, heardT;
+  function updatePill(){
+    const pill=document.getElementById('micPill'); if(!pill) return;
+    const okView = ['brief','plan','pins'].includes(state.view) || document.getElementById('m-eod').classList.contains('on');
+    pill.classList.toggle('show', state.sr!=='off' && okView);
+    pill.classList.toggle('pins', state.view==='pins' && !document.getElementById('m-eod').classList.contains('on'));
+    pill.classList.toggle('listening', listening);
+    document.getElementById('micLabel').textContent = listening ? 'Listening… say your answer' : 'Tap to answer by voice';
+  }
+  function heard(html, miss){
+    const h=document.getElementById('heard'); const inPins=(state.view==='pins' && !document.getElementById('m-eod').classList.contains('on')); h.style.top = inPins ? '108px' : '64px'; h.style.left = inPins ? '38%' : '50%'; h.innerHTML=html; h.className='heard show'+(miss?' miss':'');
+    clearTimeout(heardT); heardT=setTimeout(()=>{h.className='heard';}, 2800);
+  }
+  // What the operator can say on each screen (shown on screen, and spoken when voice replies are on)
+  const OPTS={
+    en:{brief:['Start','Full plan','Later'],plan:['Start','Refill first','Back'],offer:['Preview','Not now','Why here'],preview:['Apply','Back'],applied:['Done','Undo'],prompt:['Save','Not now'],review:['Save','Cancel'],eod:['Record a note','Send','Not now']},
+    fi:{brief:['Aloita','Suunnitelma','Myöhemmin'],plan:['Aloita','Täyttö ensin','Takaisin'],offer:['Näytä','Ei nyt','Miksi'],preview:['Käytä','Takaisin'],applied:['Valmis','Kumoa'],prompt:['Tallenna','Ei nyt'],review:['Tallenna','Peruuta'],eod:['Nauhoita','Lähetä','Ei nyt']}
+  };
+  function ctxKey(){ if(document.getElementById('m-eod').classList.contains('on')) return 'eod'; if(state.view==='pins') return P.card||null; return state.view; }
+  function optsFor(k){ return k ? (OPTS[state.srLang==='fi-FI'?'fi':'en'][k]||null) : null; }
+  function sayHtml(k){ const o=optsFor(k); if(!o) return ''; const q=o.map(x=>'<b>“'+x+'”</b>'); return 'Say '+(q.length>1? q.slice(0,-1).join(', ')+' or '+q[q.length-1] : q[0]); }
+  function spokenOpts(k){ const o=optsFor(k); if(!o||state.sr==='off') return ''; if(state.srLang==='fi-FI') return ' You can answer in Finnish. The options are on screen.'; return ' You can say '+(o.length>1? o.slice(0,-1).join(', ')+', or '+o[o.length-1] : o[0])+'.'; }
+  function renderSay(){
+    const b=document.getElementById('sayBrief'), p=document.getElementById('sayPlan'), e=document.getElementById('sayEod');
+    if(b) b.innerHTML=sayHtml('brief'); if(p) p.innerHTML=sayHtml('plan'); if(e) e.innerHTML=sayHtml('eod');
+  }
+  // speak() already calls maybeAuto right away when voice is off, so no second timer here
+  function ask(text){ speak(text + spokenOpts(ctxKey()), null, maybeAuto); }
+  let autoPending=false;
+  function maybeAuto(){
+    if(state.sr!=='auto' || listening || autoPending) return;
+    autoPending=true;
+    setTimeout(()=>{ autoPending=false; if(!listening) listen(); }, 250);
+  }
+  function listen(){
+    if(state.sr==='off') return;
+    if(!SR){ heard('<b>Voice replies aren\'t supported in this browser.</b> Use Chrome, or tap instead.', true); return; }
+    if(listening){ try{rec.stop()}catch(e){} return; }
+    try{ speechSynthesis.cancel(); }catch(e){}
+    rec = new SR(); rec.lang = state.srLang; rec.interimResults=false; rec.maxAlternatives=3; rec.continuous=false;
+    rec.onstart=()=>{ listening=true; updatePill(); };
+    rec.onend=()=>{ listening=false; updatePill(); };
+    rec.onerror=(e)=>{ listening=false; updatePill();
+      if(e.error==='not-allowed'||e.error==='service-not-allowed') heard('<b>Microphone blocked.</b> Open the GitHub Pages link in Chrome and allow the mic, or tap instead.', true);
+      else if(e.error==='no-speech') heard('<b>Didn\'t hear anything.</b> Tap the mic and try again, or tap a button.', true);
+      else heard('<b>Voice didn\'t work ('+e.error+').</b> Tap a button instead.', true); };
+    rec.onresult=(e)=>{ const alts=[...e.results[0]].map(a=>a.transcript.toLowerCase().trim()); handleVoice(alts); };
+    try{ rec.start(); }catch(e){ heard('<b>Couldn\'t start the microphone.</b> Tap instead.', true); }
+  }
+  // keyword sets: English + Finnish
+  const K={
+    // "go" is deliberately NOT a yes word: "go back" must never confirm anything
+    yes:['yes','yeah','yep','sure','okay','ok','ready','do it','kyllä','joo','juu','selvä','okei'],
+    no:['no','nope','not now','skip','cancel','ei','ei nyt','peruuta'],
+    neg:['don\'t','dont','do not','not','never','wait','stop','älä','odota'],
+    start:['start','go','let\'s go','start now','ready','aloita','aloitetaan','mennään'],
+    plan:['plan','full plan','hear the plan','run through','suunnitelma','koko suunnitelma'],
+    later:['later','not now','myöhemmin'],
+    preview:['preview','show','show me','what is it','esikatsele','näytä'],
+    apply:['apply','apply routine','do it','käytä','ota käyttöön'],
+    why:['why','why here','miksi'],
+    undo:['undo','go back','revert','put it back','kumoa','peru'],
+    done:['done','finished','thanks','thank you','valmis','kiitos'],
+    save:['save','save it','tallenna'],
+    back:['back','takaisin'],
+    change:['change','refill first','refill','muuta','täyttö ensin'],
+    note:['play','play note','voice note','note','toista','viesti'],
+    record:['record','voice note','leave a note','nauhoita'],
+    send:['send','send it','send summary','lähetä']
+  };
+  function has(alts, key){ return alts.some(t=>K[key].some(w=>(' '+t+' ').includes(' '+w+' '))); }
+  function handleVoice(alts){
+    const said='“'+alts[0]+'”', ok=(label,fn)=>{ heard('Heard '+said+' → <b>'+label+'</b>'); fn(); };
+    const eodOpen=document.getElementById('m-eod').classList.contains('on');
+    // Negative and "back" answers are always checked BEFORE any confirming answer,
+    // so "don't send", "go back" or "no, wait" can never trigger an action.
+    const isNo = has(alts,'no') || has(alts,'neg');
+    if(has(alts,'undo') && P.toast && P.toast.undo) return ok('Undo', ()=>pAct('undo'));
+    if(eodOpen){
+      if(isNo) return ok('Not now', ()=>document.getElementById('m-eod').classList.remove('on'));
+      if(has(alts,'record')) return ok('Record voice note', ()=>document.querySelector('#noteOpts .opt').click());
+      if(has(alts,'send')||has(alts,'yes')) return ok('Send summary', ()=>document.getElementById(state.chosenNote?'saveNote':'saveNoNote').click());
+    } else if(state.view==='brief'){
+      if(has(alts,'later')||isNo) return ok('Later', ()=>document.getElementById('laterBtn').click());
+      if(has(alts,'note')) return ok('Play voice note', ()=>document.querySelector('[data-note=play]').click());
+      if(has(alts,'plan')) return ok('Full plan', ()=>document.querySelector('#v-brief [data-go=plan]').click());
+      if(has(alts,'start')||has(alts,'yes')) return ok('Start now', ()=>document.querySelector('#v-brief [data-go=map]').click());
+    } else if(state.view==='plan'){
+      if(has(alts,'back')) return ok('Back', ()=>document.querySelector('#v-plan [data-go=brief-back]').click());
+      if(!isNo && has(alts,'change')) return ok('Change plan', ()=>document.getElementById('changePlan').click());
+      if(!isNo && (has(alts,'start')||has(alts,'yes'))) return ok('Start now', ()=>document.querySelector('#v-plan [data-go=map]').click());
+    } else if(state.view==='pins' && P.card){
+      const c=P.card;
+      if(c==='offer'){ if(isNo) return ok('Not now', ()=>pAct('close'));
+        if(has(alts,'why')) return ok('Why here?', ()=>pAct('why'));
+        if(has(alts,'preview')||has(alts,'yes')) return ok('Preview', ()=>pAct('preview')); }
+      if(c==='preview'){ if(has(alts,'back')||isNo) return ok('Back', ()=>pAct('back'));
+        if(has(alts,'apply')||has(alts,'yes')) return ok('Apply routine', ()=>pAct('apply')); }
+      if(c==='applied'){ if(has(alts,'undo')) return ok('Undo', ()=>pAct('undo')); if(!isNo && (has(alts,'done')||has(alts,'yes'))) return ok('Done', ()=>pAct('done')); }
+      if(c==='prompt'){ if(isNo) return ok('Not now', ()=>pAct('close'));
+        if(has(alts,'save')||has(alts,'yes')) return ok('Review & save', ()=>pAct('review')); }
+      if(c==='review'){ if(isNo) return ok('Cancel', ()=>pAct('close'));
+        if(has(alts,'save')||has(alts,'yes')) return ok('Save to my profile', ()=>pAct('save')); }
+    }
+    const k=ctxKey(), o=optsFor(k);
+    heard('Heard '+said+'. <b>'+(o? sayHtml(k) : 'Tap a button instead.')+'</b>', true);
+    if(o) ask("Sorry, I didn't catch that.");
+  }
 
   // ---------- flows ----------
   function tapKey(k){
@@ -619,7 +740,7 @@
       document.getElementById('pinBoxes').style.display='none';
       show('err'); return;
     }
-    state.op = k; state.noteDone=false; resetNote(); applyOp();
+    state.op = k; resetSession(); applyOp();
     reader.classList.add('ok'); chime(true);
     runLoad();
   }
@@ -636,31 +757,144 @@
     tEl.innerHTML=''; st.textContent = state.voice ? 'Speaking…' : 'Message';
     const orb = document.getElementById('orb');
     if(!state.voice) orb.classList.add('talk');
-    speak(text, 'orb');
+    // with voice off, start listening only after the text has finished typing (below)
+    speak(text + spokenOpts('brief'), 'orb', state.voice ? maybeAuto : null);
     const words = text.split(' '); let i=0;
     const step = ()=>{
-      if(i>=words.length){ tEl.innerHTML = text; st.textContent='Listening for “Start”, “Full plan” or “Later”'; if(!state.voice) orb.classList.remove('talk'); return; }
+      if(i>=words.length){ tEl.innerHTML = text; st.textContent='Listening for “Start”, “Full plan” or “Later”'; if(!state.voice){ orb.classList.remove('talk'); maybeAuto(); } return; }
       i++; tEl.innerHTML = words.slice(0,i).join(' ') + '<span class="cursor"></span>';
       later(step, state.voice ? 330 : 120);
     };
     step();
   }
-  function runMap(){
-    clearTimers(); show('map');
-    document.getElementById('miniNote').style.display = state.noteDone ? 'none' : 'block';
-    speak(document.getElementById('mapMsg').textContent, 'orb2');
+  // ---------- day plan ----------
+  let planChanged=false;
+  function renderDay(){
+    const items = [['Drive to Field 7','12 min, road'],['Enter from east side', OPS[state.op].level==='exp'?'your saved entry setup':'setup from experienced operators'],['Seed Field 7, south boundary first','~5 h'],['Refill seed at midday','trailer at yard'],['Send summary & leave a note','end of day']];
+    if(planChanged){ const r=items.splice(3,1)[0]; r[0]='Refill seed first'; r[1]='trailer at yard, before Field 7'; items.splice(0,0,r); }
+    document.getElementById('dayList').innerHTML = items.map(x=>'<li>'+x[0]+' <span>· '+x[1]+'</span></li>').join('');
+    document.getElementById('planMsg').textContent = planChanged ? '✓ Plan updated · fleet manager notified' : '';
+    document.getElementById('changePlan').textContent = planChanged ? 'Undo change' : 'Change plan';
   }
 
+  // ---------- Location Action Pins (Jessie's concept), driven by the operator profile ----------
+  const IC={
+    ok:'<svg width="24" height="24" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="11" fill="#2f6b3a"/><path d="M7 12.5l3.2 3.2L17 9" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    info:'<svg width="24" height="24" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="11" fill="#3b6a93"/><rect x="10.8" y="10" width="2.4" height="8" rx="1" fill="#fff"/><circle cx="12" cy="6.8" r="1.6" fill="#fff"/></svg>',
+    pin:'<svg width="18" height="22" viewBox="-18 -42 36 44"><path d="M0 0C-4-10-17-20-17-34a17 17 0 1 1 34 0C17-20 4-10 0 0Z" fill="#f2b01e" stroke="#23272a" stroke-width="3"/><circle cy="-34" r="6" fill="#23272a"/></svg>'
+  };
+  const R={
+    A:{name:"Enter Field",acts:["Engage 4WD","Turn on differential lock"],ctx:"Field 7 · East entrance · Seeder X",x:640,y:300},
+    B:{name:"Field setup",acts:["Lower Seeder X to field position","Set rear hydraulic flow","Turn on work lights","Engage rear PTO"],ctx:"Field 7 · South boundary · Seeder X",x:330,y:560}
+  };
+  // Escape text the participant types (routine name) before it goes into the page
+  function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  let P={};
+  function pReset(){ P={phase:'drive',card:null,rid:'A',why:false,from:'offer',applied:{},saved:false,name:'Field setup',scope:'loc',toast:null,msg:null}; }
+  pReset();
+  function isExp(){ return OPS[state.op].level==='exp'; }
+  function rInfo(id){
+    if(id==='A') return isExp()
+      ? {cap:'Your saved routine for this location',meta:'2 actions · Used 4 times by you',q:'Use your entry setup for this entrance?',why:'You saved this for the east entrance with Seeder X. Less wheel slip here last season.'}
+      : {cap:'Used by experienced operators here',meta:'2 actions · Used by 3 operators',q:'Use the setup other operators use here?',why:'Operators who seed Field 7 usually do this at the east entrance. It is only a suggestion; nothing changes until you apply it.'};
+    return {cap:'Your saved routine for this location',meta:'4 actions · Saved today',q:'Use your Field setup here?',why:'You saved this today at the south boundary with Seeder X.'};
+  }
+  function tractorSvg(x,y,r){
+    return `<g id="trk" style="transform:translate(${x}px,${y}px);transition:transform 1.6s ease-in-out"><g id="trkRot" style="transform:rotate(${r}deg);transition:transform .5s"><rect x="30" y="-17" width="46" height="34" rx="5" fill="#4b5155" stroke="#fff" stroke-width="3"/><path d="M26 0H30" stroke="#fff" stroke-width="5"/><circle r="27" fill="#23272a" stroke="#fff" stroke-width="4"/><path d="M-13 0L9 -13V13Z" fill="#fff"/></g><g transform="translate(0,50)"><rect x="-44" y="-14" width="88" height="28" rx="7" fill="#fff" opacity=".95"/><text y="6" text-anchor="middle" font-size="16" font-weight="700" fill="#23272a" font-family="Barlow,Arial,sans-serif">Seeder X</text></g></g>`;
+  }
+  function pinSvg(id,on){const r=R[id],w=r.name.length*10.5+26,c=on?"#f2b01e":"#23272a",st=on?"#23272a":"#fff";
+    return `<g data-pin="${id}" transform="translate(${r.x},${r.y-56})" style="cursor:pointer" role="button" aria-label="${esc(r.name)} saved routine pin"><circle r="44" cy="22" fill="transparent"/><rect x="${-34-w}" y="-4" width="${w}" height="34" rx="8" fill="#23272a"/><text x="${-34-w/2}" y="20" text-anchor="middle" font-size="17" font-weight="700" fill="#fff" font-family="Barlow,Arial,sans-serif">${esc(r.name)}</text><g transform="translate(0,56)"><path d="M0 0C-4-10-17-20-17-34a17 17 0 1 1 34 0C17-20 4-10 0 0Z" fill="${c}" stroke="${st}" stroke-width="3"/><circle cy="-34" r="6" fill="${st}"/></g></g>`}
+  function pMap(){
+    const pos = P.phase==='drive'?[200,620,180] : P.phase==='boundary'?[330,620,0] : [700,345,0];
+    const on = P.card && P.card!=='prompt' && P.card!=='review' ? P.rid : null;
+    let conn=''; if(on){const r=R[on];conn=`<path d="M${r.x+18} ${r.y-34} Q${r.x+60} ${r.y-34} 866 ${on==='A'?r.y-34:250}" stroke="#23272a" stroke-width="3" stroke-dasharray="3 7" stroke-linecap="round" fill="none" opacity=".7"/>`;}
+    const route = P.phase==='drive' ? `<path d="M200 620 H760 V400 Q760 345 700 345 H652" stroke="#e8b04a" stroke-width="8" fill="none" stroke-dasharray="16 11" stroke-linecap="round"><animate attributeName="stroke-dashoffset" from="54" to="0" dur="1.2s" repeatCount="indefinite"/></path>` : '';
+    return `<svg class="pmap" width="1280" height="744" viewBox="0 0 1280 744"><defs><pattern id="rw" width="26" height="26" patternUnits="userSpaceOnUse"><path d="M0 13H26" stroke="rgba(35,39,42,.09)" stroke-width="2"/></pattern></defs>
+<rect width="1280" height="744" fill="#c9cfba"/><rect x="700" y="70" width="460" height="170" rx="6" fill="#bcc4a8"/><rect x="820" y="470" width="300" height="200" rx="6" fill="#c0c7ad"/><rect x="900" y="260" width="120" height="70" fill="#b4b8a6" rx="4"/>
+<rect x="90" y="90" width="550" height="470" fill="#8fa077"/><rect x="90" y="90" width="550" height="470" fill="url(#rw)"/>
+<path d="M90 620H760M760 744V400Q760 345 700 345H640" stroke="#a8ab98" stroke-width="30" fill="none" stroke-linejoin="round"/><path d="M90 620H760M760 744V400Q760 345 700 345H640" stroke="#e9e5d3" stroke-width="22" fill="none" stroke-linejoin="round"/>
+<path d="M640 300V90H90V560H640V390" stroke="#23272a" stroke-width="4" fill="none" stroke-dasharray="14 8" opacity=".75"/><path d="M640 300V390" stroke="#e9e5d3" stroke-width="10"/>
+<text x="365" y="330" text-anchor="middle" font-size="40" font-weight="700" fill="#23272a" opacity=".6" font-family="Barlow,Arial,sans-serif">Field 7</text>
+<g transform="translate(560,412)"><rect x="-96" y="-17" width="148" height="30" rx="7" fill="#fff" opacity=".92"/><text x="-22" y="4" text-anchor="middle" font-size="16" font-weight="700" fill="#23272a" font-family="Barlow,Arial,sans-serif">East entrance</text></g>
+${route}${tractorSvg(pos[0],pos[1],pos[2])}${conn}${pinSvg('A',on==='A')}${P.saved?pinSvg('B',on==='B'):''}</svg>`;
+  }
+  function actList(r,ap){return r.acts.map((t,i)=>`<div class="pact"><i>${i+1}</i>${t}${ap&&P.applied[P.rid]?`<em>${IC.ok.replace(/24/g,'20')}Applied</em>`:''}</div>`).join('');}
+  function pCard(){
+    const r=R[P.rid], c=P.card, inf=rInfo(P.rid);
+    if(c==='offer') return `<h2>${esc(r.name)}</h2><div class="pctx">${r.ctx}</div><div class="pmeta">${inf.meta}</div><div class="pq">${inf.q}</div>${P.why?`<div class="pwhy">${IC.info}<span>${inf.why}</span></div>`:''}<button class="p" data-p="preview">Preview</button><div class="prow"><button data-p="close">Not now</button><button data-p="why">Why here?</button></div>`;
+    if(c==='preview') return `<h2>${esc(r.name)}</h2><div class="pctx">Applying this routine will:</div>${actList(r,false)}<div class="pnote">Nothing changes until you press Apply. You can undo right after.</div><button class="p" data-p="apply">Apply routine</button><div class="prow"><button data-p="back">Back</button></div>`;
+    if(c==='applied') return `<h2>${esc(r.name)}</h2><div class="pban">${IC.ok}<span>Routine applied · ${r.acts.length} actions</span></div>${actList(r,true)}<button class="p" style="margin-top:8px" data-p="done">Done</button>`;
+    if(c==='prompt') return `<h2>Save this routine?</h2><div class="pbody">You made 4 changes here. Save them for the next time you use Seeder X at this spot?</div><button class="p" data-p="review">Review &amp; save</button><div class="prow"><button data-p="close">Not now</button></div>`;
+    if(c==='review') return `<h2>Review &amp; save</h2><div class="pctx">4 changes you made here</div>${R.B.acts.map((t,i)=>`<div class="pact" style="min-height:44px;padding:6px 12px;font-size:18px"><i>${i+1}</i>${t}</div>`).join('')}<label for="pnm">Routine name</label><input id="pnm" value="${esc(P.name)}" maxlength="24"><label>Offer it</label><div class="pscope"><button class="${P.scope==='loc'?'on':''}" data-p="scope-loc">Here only</button><button class="${P.scope==='any'?'on':''}" data-p="scope-any">Any field, Seeder X</button></div><button class="p" style="margin-top:14px" data-p="save">Save to my profile</button><div class="prow"><button data-p="close">Cancel</button></div>`;
+    return '';
+  }
+  function pDraw(){
+    const o=OPS[state.op], loc=P.phase==='boundary'?'South boundary':'East entrance', moving=P.phase==='drive';
+    const cap = (P.card && ['offer','preview','applied'].includes(P.card)) ? `<div class="pcap">${IC.pin}${rInfo(P.rid).cap}</div>` : '';
+    document.getElementById('ps').innerHTML =
+      `<div class="phd"><b>Task: Seeding</b><span class="pchip">Field 7</span><span class="pchip t">Seeder X</span><span>${loc}</span><span class="sp"></span><button class="op" data-go="notme"><span class="av">${o.init}</span><span>${o.name}</span> ▾</button><span>${moving?'● Moving · 14 km/h':'● Stopped · 0 km/h'}</span></div>`+
+      pMap()+
+      (P.toast?`<div class="ptoast">${IC.ok}<span>${P.toast.text}</span>${P.toast.undo?'<button data-p="undo">Undo</button>':''}</div>`:'')+
+      (P.card?`<div class="pcard">${cap}${pCard()}<div class="psay">${sayHtml(P.card)}</div></div>`:'')+
+      (!P.card && P.msg ? `<div class="pbubble"><div class="orb${P.talk?' talk':''}" id="orb2"><i></i><i></i><i></i><i></i></div><div><p>${P.msg}</p><div class="src">${P.src||''}</div></div></div>`:'')+
+      `<button class="peod" data-go="eod">End of day</button>`;
+  }
+  function pToast(t){ P.toast=t; later(()=>{ P.toast=null; pDraw(); }, 6000); }
+  function setT(x,y,r){ const t=document.getElementById('trk'), rr=document.getElementById('trkRot'); if(!t) return; t.style.transform=`translate(${x}px,${y}px)`; rr.style.transform=`rotate(${r}deg)`; }
+  function runMap(){
+    clearTimers(); pReset(); show('pins');
+    P.msg = state.mapMsg; P.src = 'Offers only appear when you are stopped.'; pDraw();
+    speak(state.mapMsg, 'orb2');
+    later(()=>setT(760,620,180), 500);
+    later(()=>setT(760,400,90), 2300);
+    later(()=>setT(700,345,0), 4100);
+    later(arrive, 5900);
+  }
+  function arrive(){
+    if(!document.getElementById('v-pins').classList.contains('on')){ clearTimers(); pReset(); show('pins'); }
+    P.phase='arrived'; P.card='offer'; P.rid='A'; P.why=false; pDraw();
+    ask(isExp() ? "You're at the east entrance. Want your usual entry setup?" : "You're at the east entrance. Most operators use a quick setup here. Want to preview it?");
+  }
+  function toBoundary(){
+    if(!document.getElementById('v-pins').classList.contains('on')){ clearTimers(); pReset(); show('pins'); }
+    P.phase='boundary'; P.card=null;
+    P.msg = isExp() ? "Set up Seeder X when you're ready. I'll keep track and offer to save it for next time."
+                    : "Time to set up Seeder X. Want me to walk you through it? I'll offer to save your setup when you're done.";
+    P.src = 'Prepares for first task · guided setup is the next step to prototype';
+    pDraw(); speak(P.msg, 'orb2');
+  }
+  function pAct(a){
+    const r=R[P.rid];
+    if(a==='why') P.why=!P.why;
+    else if(a==='preview'){ P.card='preview'; pDraw(); ask('This will '+r.acts.join(' and ').toLowerCase()+'.'); return; }
+    else if(a==='back') P.card='offer';
+    else if(a==='close'){ P.card=null; P.why=false; if(P.phase==='arrived'){ P.msg='No problem. I won\'t change anything.'; P.src=''; } }
+    else if(a==='apply'){ P.applied[P.rid]=true; P.card='applied'; pToast({text:'Applied: '+r.acts.join(', '),undo:true}); pDraw(); ask('Done. '+r.acts.length+' settings applied.'); return; }
+    else if(a==='undo'){ P.applied[P.rid]=false; P.card=null; pToast({text:'Reverted last change'}); speak('Okay, I put it back.', null); }
+    else if(a==='done'){ P.card=null; pDraw(); later(toBoundary, 900); return; }
+    else if(a==='prompt'){ if(!document.getElementById('v-pins').classList.contains('on')) toBoundary(); P.phase='boundary'; P.rid='B'; P.card='prompt'; ask('You made four changes here. Want to save them for next time?'); }
+    else if(a==='review'){ P.card='review'; pDraw(); ask("Here's what you changed. Save it to your profile?"); return; }
+    else if(a==='scope-loc') P.scope='loc';
+    else if(a==='scope-any') P.scope='any';
+    else if(a==='save'){ const v=(document.getElementById('pnm')||{}).value; P.name=(v||'').trim()||'Field setup'; R.B.name=P.name; P.saved=true; P.card=null; P.msg=null; pToast({text:'Saved to your profile · '+(P.scope==='loc'?'this location':'any field with Seeder X')}); speak("Saved. I'll offer it next time you're here with Seeder X.", null); }
+    else if(a==='return'){ if(!P.saved){ P.saved=true; R.B.name=P.name; } if(!document.getElementById('v-pins').classList.contains('on')){ show('pins'); } P.phase='boundary'; P.rid='B'; P.why=false; P.card='offer'; ask('Welcome back to the south boundary. Use your field setup?'); }
+    pDraw();
+  }
+
+  // Clear everything one participant did, so the next session starts clean
+  function resetSession(){
+    state.noteDone=false; resetNote();
+    state.chosenNote=null; document.querySelectorAll('#noteOpts .opt').forEach(x=>x.classList.remove('on'));
+    planChanged=false;
+    R.B.name='Field setup'; pReset();
+    const tr=document.getElementById('transcript'); if(tr) tr.innerHTML='';
+  }
   function resetNote(){
-    ['noteBtns','noteBtns2'].forEach(id=>{
-      const el=document.getElementById(id);
-      el.innerHTML='<button class="sbtn pri" data-note="ok">Checked ✓</button><button class="sbtn" data-note="report">'+(id==='noteBtns'?'Report issue':'Report')+'</button>';
-    });
+    document.getElementById('noteBtns').innerHTML='<button class="sbtn pri" data-note="ok">Checked ✓</button><button class="sbtn" data-note="report">Report issue</button>';
   }
   function resolveNote(msg){
     state.noteDone = true;
-    ['noteBtns','noteBtns2'].forEach(id=>document.getElementById(id).innerHTML='<div class="resolved">'+msg+'</div>');
-    later(()=>{ document.getElementById('miniNote').style.display='none'; }, 1400);
+    document.getElementById('noteBtns').innerHTML='<div class="resolved">'+msg+'</div>';
   }
 
   // ---------- events ----------
@@ -669,22 +903,38 @@
   });
 
   document.addEventListener('click', e=>{
+    const pp = e.target.closest('[data-p]'); if(pp){ pAct(pp.dataset.p); return; }
+    const pin = e.target.closest('[data-pin]'); if(pin){ P.rid=pin.dataset.pin; P.card='offer'; P.why=false; P.toast=null; pDraw(); return; }
     const n = e.target.closest('[data-note]');
+    if(n && n.dataset.note==='play'){ const was=state.voice; state.voice=true; speak("Hey, it's Jari. The left rear tire looked low when I parked. Worth a check before you go.", null, null, {pitch:0.8}); state.voice=was; return; }
     if(n){ if(n.dataset.note==='ok') resolveNote('✓ Marked checked · logged for fleet manager'); else document.getElementById('m-report').classList.add('on'); return; }
     if(e.target.closest('[data-close]')){ e.target.closest('.scrim').classList.remove('on'); return; }
     const g = e.target.closest('[data-go]'); if(!g) return;
     const to = g.dataset.go;
-    if(to==='idle'){ clearTimers(); document.getElementById('reader').className='reader ready'; show('idle'); }
+    if(to==='idle'){ clearTimers(); resetSession(); applyOp(); document.getElementById('reader').className='reader ready'; show('idle'); }
     else if(to==='brief'){ applyOp(); clearTimers(); runBrief(); }
     else if(to==='brief-back'){ clearTimers(); show('brief'); }
-    else if(to==='plan'){ applyOp(); clearTimers(); show('plan'); speak("Sure. Here's the plan for today.", 'orb'); }
+    else if(to==='plan'){ applyOp(); clearTimers(); show('plan'); ask("Sure. Here's the plan for today."); }
     else if(to==='map'){ applyOp(); runMap(); }
-    else if(to==='eod'){ clearTimers(); if(!document.getElementById('v-map').classList.contains('on')){ applyOp(); show('map'); } document.getElementById('m-eod').classList.add('on'); }
+    else if(to==='arrive'){ applyOp(); clearTimers(); arrive(); }
+    else if(to==='boundary'){ applyOp(); clearTimers(); toBoundary(); }
+    else if(to==='eod'){ clearTimers(); applyOp(); if(!document.getElementById('v-pins').classList.contains('on')){ pReset(); P.phase='boundary'; show('pins'); pDraw(); } openEod(); }
     else if(to==='notme'){ document.getElementById('m-notme').classList.add('on'); }
     else if(to==='err'){ tapKey('unknown'); }
     else if(to==='err-pin'){ show('err'); pinMode(); }
   });
 
+  document.getElementById('changePlan').onclick = ()=>{ planChanged=!planChanged; renderDay(); speak(planChanged ? "Sure. Refill first, then Field 7. I've let your fleet manager know." : "Okay, back to the original plan. I've let your fleet manager know.", 'orb'); };
+  function openEod(){
+    const items=['Seeded Field 7 · 5 h 12 min (logged automatically)'];
+    if(P.applied.A) items.push('Used “Enter Field” routine at the east entrance');
+    if(P.saved) items.push('Saved a new routine: “'+esc(P.name)+'”');
+    items.push(state.noteDone ? 'Left rear tire checked (Jari\'s note)' : '<li class="open">Open: left rear tire note not checked</li>');
+    document.getElementById('sumList').innerHTML = items.map(x=>x.startsWith('<li')?x:'<li>'+x+'</li>').join('');
+    document.getElementById('m-eod').classList.add('on');
+    ask("Here's today's summary. Check it, then send. Want to leave a note for tomorrow?");
+  }
+  document.getElementById('ps').addEventListener('input', e=>{ if(e.target.id==='pnm') P.name=e.target.value; });
   document.getElementById('laterBtn').onclick = ()=>{
     clearTimers();
     document.getElementById('transcript').textContent = "No problem, I'll stay quiet. Just say “Brief me” when you're ready.";
@@ -700,7 +950,7 @@
     document.getElementById('errTitle').textContent = 'Enter your 4-digit PIN';
     document.getElementById('errText').textContent = 'Your profile loads the same way as with your key.';
     document.getElementById('pinBoxes').style.display='flex';
-    later(()=>{ state.op='aino'; applyOp(); resetNote(); runLoad(); }, 1800);
+    later(()=>{ state.op='aino'; resetSession(); applyOp(); runLoad(); }, 1800);
   }
   document.getElementById('pinBtn').onclick = pinMode;
   function guest(){
@@ -727,15 +977,16 @@
     clearTimers(); show('done');
     document.querySelector('#v-done h2').textContent = 'Saved. See you tomorrow, ' + OPS[state.op].name + '.';
     document.getElementById('doneText').textContent = withNote
-      ? 'Your setup is saved to your key. The next operator on this tractor will hear your note when they tap in.'
-      : 'Your setup is saved to your key.';
+      ? 'Summary sent to your fleet manager. Your setup and routines are saved to your key. The next operator will hear your note when they tap in.'
+      : 'Summary sent to your fleet manager. Your setup and routines are saved to your key.';
     const q = document.getElementById('doneQuote');
     if(withNote){
-      const note = state.chosenNote || '“All good, nothing to report.”';
+      let note = state.chosenNote || '🎙 Voice note (0:08)';
+      if(note.startsWith('🎙')) note = '🎙 Voice note (0:08), played in their own voice';
       q.style.display='block'; q.innerHTML = '<b>Tomorrow\'s welcome will include:</b><br>' + OPS[state.op].name + ' left a note: ' + note;
     } else q.style.display='none';
     document.getElementById('reader').className='reader';
-    speak(withNote ? "All saved. I'll pass your note on to whoever's next. See you tomorrow." : "All saved. See you tomorrow.", null);
+    speak(withNote ? "Sent. I'll pass your note on to whoever's next. See you tomorrow." : "Sent. See you tomorrow.", null);
   }
   document.getElementById('saveNote').onclick = ()=>finish(true);
   document.getElementById('saveNoNote').onclick = ()=>finish(false);
@@ -750,6 +1001,12 @@
     });
   }
   seg('lenSeg','len'); seg('voiceSeg','voice', v=>v==='on'); seg('rateSeg','rate', v=>parseFloat(v));
+  seg('srSeg','sr'); seg('srLangSeg','srLang');
+  ['srSeg','srLangSeg'].forEach(id=>document.getElementById(id).addEventListener('click', ()=>{ renderSay(); if(state.view==='pins') pDraw(); }));
+  renderSay();
+  document.getElementById('srSeg').addEventListener('click', ()=>{ if(state.sr==='off' && listening){ try{rec.stop()}catch(e){} } updatePill(); if(state.sr!=='off' && !SR) heard('<b>This browser has no speech recognition.</b> Use Chrome.', true); });
+  document.getElementById('micPill').addEventListener('click', listen);
+  new MutationObserver(updatePill).observe(document.getElementById('m-eod'), {attributes:true, attributeFilter:['class']});
   document.getElementById('voiceSel').addEventListener('change', e=>{ state.voiceName = e.target.value; });
   document.getElementById('testVoice').addEventListener('click', ()=>{ const was=state.voice; state.voice=true; speak("Morning! Here's how I sound today.", 'orb'); state.voice=was; });
   fillVoices();
